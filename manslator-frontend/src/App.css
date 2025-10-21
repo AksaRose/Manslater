@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Quicksand', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fce4ec; /* Light pink background */
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-image: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: #333;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 4rem;
+  color: #880e4f; /* Darker pink for heading */
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.translator-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 90%;
+  max-width: 700px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease-in-out;
+}
+
+.translator-container:hover {
+  transform: translateY(-5px);
+}
+
+.input-text, .output-text {
+  width: calc(100% - 20px);
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #ff80ab; /* Medium pink border */
+  background-color: #fff;
+  color: #333;
+  font-size: 1.1rem;
+  min-height: 120px;
+  resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.input-text:focus, .output-text:focus {
+  outline: none;
+  border-color: #e91e63; /* Accent pink on focus */
+}
+
+.output-text {
+  text-align: left;
+  background-color: #f8f8f8;
+  color: #555;
+  cursor: default;
+  min-height: 50px; /* Adjust as needed */
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #ff80ab;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 10px; /* Add some space */
+}
+
+.translate-button {
+  background-color: #e91e63; /* Accent pink button */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.translate-button:hover {
+  background-color: #c2185b; /* Darker pink on hover */
+  transform: translateY(-2px);
+}
+
+.translate-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.loading-text {
+  color: #e91e63;
+  font-style: italic;
+  margin-top: 10px;
+}
