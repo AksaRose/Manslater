@@ -10,7 +10,7 @@ function App() {
     setIsLoading(true);
     setTranslatedText(''); // Clear previous translation
     try {
-      const response = await fetch('http://localhost:5001/translate', {
+      const response = await fetch('https://manslater.onrender.com/translate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
