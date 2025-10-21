@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   const [inputText, setInputText] = useState('');
@@ -32,29 +33,32 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Manslator</h1>
-        <div className="translator-container">
-          <textarea
-            className="input-text"
-            placeholder="ex: I'm fine"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            disabled={isLoading}
-          ></textarea>
-          <button className="translate-button" onClick={handleTranslate} disabled={isLoading}>
-            {isLoading ? 'Translating Fun...' : 'Translate'}
-          </button>
-          {isLoading && <p className="loading-text">Wait, lemme fix it...</p>}
-          {!isLoading && translatedText && (
-            <div className="output-text">
-              <p>{translatedText}</p>
-            </div>
-          )}
-        </div>
-      </header>
-    </div>
+    <>
+      <div className="App">
+        <header className="App-header">
+          <h1>Manslator</h1>
+          <div className="translator-container">
+            <textarea
+              className="input-text"
+              placeholder="ex: I'm fine"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={isLoading}
+            ></textarea>
+            <button className="translate-button" onClick={handleTranslate} disabled={isLoading}>
+              {isLoading ? 'Translating Fun...' : 'Translate'}
+            </button>
+            {isLoading && <p className="loading-text">Wait, lemme fix it...</p>}
+            {!isLoading && translatedText && (
+              <div className="output-text">
+                <p>{translatedText}</p>
+              </div>
+            )}
+          </div>
+        </header>
+      </div>
+      <Analytics />
+    </>
   );
 }
 
