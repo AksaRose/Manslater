@@ -36,7 +36,7 @@ function App() {
     <>
       <div className="App">
         <header className="App-header">
-          <h1>Manslator</h1>
+          <h1>Manslater</h1>
           <div className="translator-container">
             <textarea
               className="input-text"
