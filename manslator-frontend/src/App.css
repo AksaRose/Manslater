@@ -1,11 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;700&display=swap');
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   font-family: 'Quicksand', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fce4ec; /* Light pink background */
+  background-color: #fce4ec;
+  min-height: 100vh; /* Ensure body takes full viewport height */
+  touch-action: manipulation; /* Improve touch responsiveness */
 }
 
 .App {
@@ -14,7 +20,7 @@ body {
 
 .App-header {
   background-image: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
-  min-height: 100vh;
+  min-height: 100dvh; /* Use dynamic viewport height for better mobile support */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +34,7 @@ body {
 h1 {
   font-family: 'Pacifico', cursive;
   font-size: 4rem;
-  color: #880e4f; /* Darker pink for heading */
+  color: #880e4f; 
   margin-bottom: 30px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -54,7 +60,7 @@ h1 {
   width: calc(100% - 20px);
   padding: 15px;
   border-radius: 10px;
-  border: 2px solid #ff80ab; /* Medium pink border */
+  border: 2px solid #ff80ab; 
   background-color: #fff;
   color: #333;
   font-size: 1.1rem;
@@ -66,7 +72,7 @@ h1 {
 
 .input-text:focus, .output-text:focus {
   outline: none;
-  border-color: #e91e63; /* Accent pink on focus */
+  border-color: #e91e63; 
 }
 
 .output-text {
@@ -74,16 +80,16 @@ h1 {
   background-color: #f8f8f8;
   color: #555;
   cursor: default;
-  min-height: 50px; /* Adjust as needed */
+  min-height: 50px; 
   padding: 15px;
   border-radius: 10px;
   border: 2px solid #ff80ab;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-  margin-top: 10px; /* Add some space */
+  margin-top: 10px; 
 }
 
 .translate-button {
-  background-color: #e91e63; /* Accent pink button */
+  background-color: #e91e63; 
   color: white;
   border: none;
   padding: 15px 30px;
@@ -96,7 +102,7 @@ h1 {
 }
 
 .translate-button:hover {
-  background-color: #c2185b; /* Darker pink on hover */
+  background-color: #c2185b; 
   transform: translateY(-2px);
 }
 
@@ -109,4 +115,44 @@ h1 {
   color: #e91e63;
   font-style: italic;
   margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .translator-container {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .input-text, .output-text, .translate-button {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .translate-button {
+    padding: 12px 25px;
+  }
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .translator-container {
+    padding: 15px;
+  }
+
+  .input-text, .output-text, .translate-button {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  .translate-button {
+    padding: 10px 20px;
+  }
 }
