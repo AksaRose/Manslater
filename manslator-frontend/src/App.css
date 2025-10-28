@@ -157,3 +157,44 @@ h1 {
     padding: 10px 20px;
   }
 }
+
+.buy-me-a-coffee {
+  margin-top: 80px; /* Further increased margin to move it down */
+}
+
+.buy-me-a-coffee a {
+  display: inline-block;
+  background-color: #FFDD00; /* Reverted to Buy Me a Coffee yellow */
+  color: #1a1a1a; /* Changed text color for contrast with yellow */
+  padding: 8px 18px; /* Smaller padding */
+  border-radius: 20px; /* Slightly smaller border-radius */
+  text-decoration: none;
+  font-size: 0.9rem; /* Smaller font size */
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Add playful styling */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Quicksand', sans-serif; /* Ensure consistent playful font */
+}
+
+.bmc-logo {
+  width: 25px; /* Adjust as needed */
+  height: 25px; /* Adjust as needed */
+  vertical-align: middle; /* Align with text */
+}
+
+.buy-me-a-coffee a:hover {
+  background-color: #e6cb00; /* Darker yellow on hover */
+  transform: translateY(-2px) scale(1.02); /* Slightly larger and moved up on hover */
+  box-shadow: 0 7px 20px rgba(0, 0, 0, 0.25);
+}
+
+.buy-me-a-coffee a:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
