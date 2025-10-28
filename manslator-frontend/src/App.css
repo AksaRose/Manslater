@@ -160,6 +160,10 @@ h1 {
 
 .buy-me-a-coffee {
   margin-top: 80px; /* Further increased margin to move it down */
+  position: absolute; /* Use absolute positioning */
+  bottom: 20px; /* Position at the bottom */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Adjust for perfect centering */
 }
 
 .buy-me-a-coffee a {

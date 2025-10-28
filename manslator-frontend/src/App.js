@@ -56,9 +56,9 @@ function App() {
             )}
           </div>
           <div className="buy-me-a-coffee">
-            <a href="https://buymeacoffee.com/aksarose" target="_blank" rel="noopener noreferrer">
-              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%235D4037' d='M83.4 20.8h-11.7v-1.7c0-2.3-1.9-4.2-4.2-4.2H32.5c-2.3 0-4.2 1.9-4.2 4.2v1.7H16.6c-2.3 0-4.2 1.9-4.2 4.2v25c0 2.3 1.9 4.2 4.2 4.2h12.5v16.7c0 2.3 1.9 4.2 4.2 4.2h33.3c2.3 0 4.2-1.9 4.2-4.2V54.2h12.5c2.3 0 4.2-1.9 4.2-4.2V25c0-2.3-1.9-4.2-4.2-4.2zM36.7 19.1h26.7v1.7H36.7v-1.7zM79.2 45.8h-8.3V25h8.3v20.8z'/%3E%3Cpath fill='%23FFDD00' d='M70.8 50c0 1.9-1.5 3.3-3.3 3.3H32.5c-1.9 0-3.3-1.5-3.3-3.3V25c0-1.9 1.5-3.3 3.3-3.3h35c1.9 0 3.3 1.5 3.3 3.3v25z'/%3E%3C/svg%3E" alt="Buy Me a Coffee logo" class="bmc-logo" /> Buy Me a Coffee
-            </a>
+          <a href="https://www.buymeacoffee.com/aksarose" target="_blank" rel="noopener noreferrer">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{ height: '40px', width: '145px' }} />
+          </a>
           </div>
         </header>
       </div>
