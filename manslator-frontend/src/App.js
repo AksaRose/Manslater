@@ -8,6 +8,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleTranslate = async () => {
+    if (!inputText.trim()) {
+      setTranslatedText('Please enter some text to translate.');
+      return;
+    }
+
     setIsLoading(true);
     setTranslatedText(''); // Clear previous translation
     try {
@@ -54,11 +59,6 @@ function App() {
                 <p>{translatedText}</p>
               </div>
             )}
-          </div>
-          <div className="buy-me-a-coffee">
-          <a href="https://www.buymeacoffee.com/aksarose" target="_blank" rel="noopener noreferrer">
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style={{ height: '40px', width: '145px' }} />
-          </a>
           </div>
         </header>
       </div>
