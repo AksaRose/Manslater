@@ -1,0 +1,185 @@
+/* Home styles */
+.home-root {
+  position: relative;
+}
+
+.hero-svg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Scale the art responsively but cap at its natural size */
+  width: min(75vw, 1448px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none; /* don't block clicks */
+}
+
+.hero-svg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for the first vector */
+.hero-svg-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Second decorative SVG */
+.hero-svg-2 {
+  position: fixed;
+  left: 0;
+  bottom: 0; /* anchor near bottom for depth */
+  width: min(85vw, 1813px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-2 svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for second vector */
+.hero-svg-2-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-2-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Third decorative SVG */
+.hero-svg-3 {
+  position: fixed;
+  bottom: 0;
+  right: 0; /* place on the top-right for balance */
+  width: min(60vw, 1010px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-3 svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for third vector */
+.hero-svg-3-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-3-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .hero-svg {
+    width: min(85vw, 1448px);
+  }
+  .hero-svg-2 {
+    display: none; /* hide desktop vector 1 */
+  }
+  .hero-svg-mobile {
+    display: block; /* show mobile version */
+    width: 110vw;
+    left: -5vw; /* small overscan to avoid edge gaps */
+  }
+  .hero-svg-3 {
+    width: min(50vw, 1010px);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Avoid accidental horizontal scroll on small screens */
+  body {
+    overflow-x: hidden;
+  }
+
+  .hero-svg {
+    width: 95vw;
+  }
+  .hero-svg-2 {
+    display: none;
+  }
+  .hero-svg-2-mobile {
+    display: block;
+    width: 125vw;
+    left: -12vw;
+    bottom: -8vh;
+  }
+  .hero-svg-3 {
+    display: none;
+  }
+  .hero-svg-3-mobile {
+    display: block;
+    width: 95vw;
+    right: -10vw;
+    bottom: -5vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-svg {
+    display: none;
+  }
+  .hero-svg-mobile {
+    display: block;
+    width: 120vw;
+    left: -10vw;
+  }
+  .hero-svg-2 {
+    display: none;
+  }
+  .hero-svg-2-mobile {
+    display: block;
+    width: 140vw;
+    left: -22vw;
+    bottom: -12vh;
+  }
+  .hero-svg-3 {
+    display: none;
+  }
+  .hero-svg-3-mobile {
+    display: block;
+    width: 115vw;
+    right: -20vw;
+    bottom: -8vh;
+  }
+}
