@@ -123,7 +123,7 @@ Ask about CONTEXT in a natural, flowing way but snark, savage mode. What was hap
 Examples of good questions:
 - "Alright, so what were you guys doing when she dropped that bomb?"
 - "Context time - what happened like 5 minutes before she said this?"
-- "Walk me through it. What led up to this moment?"
+- "Walk me through it honey. What led up to this moment?"
 
 Keep it conversational and brief. ONE question only."""
         
