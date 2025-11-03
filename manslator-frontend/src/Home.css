@@ -108,10 +108,85 @@
   height: auto;
 }
 
+/* Centered PNG content */
+.center-image-container {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  z-index: 1; /* above decorative vectors */
+}
+
+/* Brand row: logo + title */
+.hero-brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  padding: 0 0vw;
+}
+/* Remove extra margin inside the horizontal brand row */
+.hero-brand .hero-title {
+  margin: 0;
+}
+
+/* Default (desktop) logo size per spec ~73.36x62.54 */
+.hero-logo {
+  width: 73.36px;
+  height: 62.54px; /* set explicit height to match design */
+  flex: 0 0 auto;
+  gap: 0;
+}
+
+.center-image {
+  display: block;
+  width: min(60vw, 520px);
+  height: auto;
+}
+
+/* Centered hero text */
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 4vw;
+}
+
+.hero-title {
+  font-family: "Shopie", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 120px;
+  line-height: 147px;
+  color: #d81b60;
+  text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
+  margin: 0 0 12px 0;
+}
+
+.hero-subtitle {
+  font-family: "Quicksand", sans-serif;
+  font-size: clamp(14px, 2.6vw, 22px);
+  color: #444;
+  margin: 0;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .hero-svg {
     width: min(85vw, 1448px);
+  }
+  /* keep desktop spec on tablets unless overridden below */
+  .hero-logo {
+    width: 73.36px;
+    height: 62.54px;
+  }
+  .hero-brand {
+    gap: 10px;
   }
   .hero-svg-2 {
     display: none; /* hide desktop vector 1 */
@@ -130,6 +205,20 @@
   /* Avoid accidental horizontal scroll on small screens */
   body {
     overflow-x: hidden;
+  }
+
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+
+  /* Mobile/tablet logo size per spec ~60.36x57.44 */
+  .hero-logo {
+    width: 60.36px;
+    height: 57.44px;
+  }
+  .hero-brand {
+    gap: 8px;
   }
 
   .hero-svg {
@@ -152,6 +241,18 @@
     width: 95vw;
     right: -10vw;
     bottom: -5vh;
+  }
+
+  .center-image {
+    width: min(75vw, 460px);
+  }
+  /* Ensure mobile uses fixed size per spec */
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+  .hero-subtitle {
+    font-size: clamp(14px, 3.2vw, 20px);
   }
 }
 
@@ -181,5 +282,22 @@
     width: 115vw;
     right: -20vw;
     bottom: -8vh;
+  }
+
+  /* Keep same mobile sizing on smaller phones */
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+  /* Keep the same mobile spec on small phones */
+  .hero-logo {
+    width: 60.36px;
+    height: 57.44px;
+  }
+  .hero-brand {
+    gap: 6px;
+  }
+  .hero-subtitle {
+    font-size: clamp(13px, 4vw, 18px);
   }
 }

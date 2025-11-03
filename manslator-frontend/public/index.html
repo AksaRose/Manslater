@@ -21,6 +21,24 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!-- Local Shopie font (served from /public). Place shopie.otf in /public or /public/fonts/. -->
+    <link
+      rel="preload"
+      href="%PUBLIC_URL%/shopie.otf"
+      as="font"
+      type="font/otf"
+      crossorigin
+    />
+    <style>
+      @font-face {
+        font-family: "Shopie";
+        src: url("%PUBLIC_URL%/shopie.otf") format("opentype"),
+          url("%PUBLIC_URL%/fonts/shopie.otf") format("opentype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+    </style>
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
