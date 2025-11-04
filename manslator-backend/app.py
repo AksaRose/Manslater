@@ -44,7 +44,7 @@ def translate_text():
             max_tokens=100,
         )
 
-        translated_output = response.choices[0].message["content"].strip()
+        translated_output = response.choices[0].message.content.strip()
         return jsonify({"translatedText": translated_output})
 
     except Exception as e:
