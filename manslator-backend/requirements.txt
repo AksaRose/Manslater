@@ -1,7 +1,8 @@
 Flask
-transformers
-torch
-gunicorn
 Flask-Cors
+gunicorn
 python-dotenv
 requests
+transformers
+torch
+together
