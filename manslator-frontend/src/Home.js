@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/translator");
+  };
+
   return (
     <div className="home-root">
       <div className="hero-svg" aria-hidden="true">
@@ -264,6 +271,9 @@ export default function Home() {
           </svg>
           <h1 className="hero-title">manslater</h1>
         </div>
+        <button className="glass-button" onClick={handleClick}>
+          Talk to Manslater
+        </button>
       </div>
     </div>
   );
