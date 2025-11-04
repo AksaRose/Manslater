@@ -213,7 +213,7 @@
 @media screen and (max-width: 768px) {
   .glass-button {
     padding: 17px 18px;
-    font-size: 24px;
+    font-size: 23px;
     margin-top: 1px;
     border-width: 0.5px;
     border-color: rgb(220, 220, 220);
@@ -286,8 +286,8 @@
 
   /* Glass button mobile styles */
   .glass-button {
-    padding: 12px 28px;
-    font-size: 21px; /* Increased font size for better readability on mobile */
+    padding: 12px 32px;
+    font-size: 16px;
     border-width: 0.5px;
     -webkit-tap-highlight-color: transparent; /* Remove default mobile tap highlight */
     touch-action: manipulation; /* Optimize for touch */

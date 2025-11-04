@@ -1,9 +1,8 @@
 import React from "react";
 import Chat from "./Chat";
-import './Convo.css';
+import "./Convo.css";
 
-export default function Home() {
-
+export default function Convo() {
   return (
     <div className="home-root">
       <div className="hero-svg" aria-hidden="true">
