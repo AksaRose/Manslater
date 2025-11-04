@@ -10,3 +10,4 @@ langgraph
 together
 pydantic
 uvicorn
+redis
