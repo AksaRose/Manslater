@@ -3,7 +3,7 @@
   position: relative;
 }
 
-.hero-svg {
+.home-hero-svg {
   position: fixed;
   top: 0;
   left: 0;
@@ -15,33 +15,33 @@
 }
 
 /* Common SVG styles */
-[class^="hero-svg"] {
+[class^="home-hero-svg"] {
   position: fixed;
   height: auto;
   z-index: 0;
   pointer-events: none;
 }
 
-[class^="hero-svg"] svg {
+[class^="home-hero-svg"] svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
 /* Desktop SVGs */
-.hero-svg {
+.home-hero-svg {
   top: 0;
   left: 0;
   width: min(75vw, 1448px);
 }
 
-.hero-svg-2 {
+.home-hero-svg-2 {
   left: 0;
   bottom: 0;
   width: min(85vw, 1813px);
 }
 
-.hero-svg-3 {
+.home-hero-svg-3 {
   bottom: 0;
   right: 0;
   width: min(60vw, 1010px);
@@ -53,23 +53,23 @@
   width: 100vw;
 }
 
-.hero-svg-mobile {
+.home-hero-svg-mobile {
   top: 0;
   left: 0;
 }
 
-.hero-svg-2-mobile {
+.home-hero-svg-2-mobile {
   left: 0;
   bottom: 0;
 }
 
-.hero-svg-3-mobile {
+.home-hero-svg-3-mobile {
   bottom: 0;
   right: 0;
 }
 
 /* Centered PNG content */
-.center-image-container {
+.home-center-image-container {
   position: fixed;
   inset: 0; /* top:0; right:0; bottom:0; left:0 */
   display: flex;
@@ -81,7 +81,7 @@
 }
 
 /* Brand row: logo + title */
-.hero-brand {
+.home-hero-brand {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -92,12 +92,12 @@
   z-index: 4; /* Ensure brand container stays above other elements */
 }
 /* Remove extra margin inside the brand column */
-.hero-brand .hero-title {
+.home-hero-brand .home-hero-title {
   margin: 0;
 }
 
 /* Default (desktop) logo size per spec ~73.36x62.54 */
-.hero-logo {
+.home-hero-logo {
   width: 73.36px;
   height: 62.54px; /* set explicit height to match design */
   flex: 0 0 auto;
@@ -124,7 +124,7 @@
   z-index: 2;
 }
 
-.hero-title {
+.home-hero-title {
   position: relative;
   font-family: "Shopie", sans-serif;
   font-style: normal;
@@ -137,7 +137,7 @@
   z-index: 3;
 }
 
-.hero-title::before {
+.home-hero-title::before {
   content: "";
   position: absolute;
   width: 606px;
@@ -159,7 +159,7 @@
   color: #444;
   margin: 0;
 }
-.glass-button {
+.home-glass-button {
   /* Layout */
   display: flex;
   justify-content: center;
@@ -189,7 +189,7 @@
   transition: all 0.3s ease;
 }
 
-.glass-button::before {
+.home-glass-button::before {
   content: "";
   position: absolute;
   inset: 0 0 50% 0;
@@ -201,7 +201,7 @@
   pointer-events: none;
 }
 
-.glass-button:hover {
+.home-glass-button:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
   box-shadow: 0 12px 40px 0 rgba(210, 208, 208, 0.25),
@@ -211,7 +211,7 @@
 /* Mobile styles for glass button */
 
 @media screen and (max-width: 768px) {
-  .glass-button {
+  .home-glass-button {
     padding: 17px 18px;
     font-size: 23px;
     margin-top: 1px;
@@ -221,14 +221,14 @@
       inset 0 1px 0 0 rgba(250, 250, 250, 0.3);
   }
 
-  .glass-button:hover {
+  .home-glass-button:hover {
     transform: translateY(-1px);
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15),
       inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
   }
 
-  .glass-button:active {
+  .home-glass-button:active {
     transform: translateY(0);
     background: rgba(255, 255, 255, 0.05);
     box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1),
@@ -236,7 +236,7 @@
   }
 }
 
-.glass-button:active {
+.home-glass-button:active {
   transform: translateY(0);
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
@@ -248,22 +248,22 @@
     width: min(85vw, 1448px);
   }
   /* keep desktop spec on tablets unless overridden below */
-  .hero-logo {
+  .home-hero-logo {
     width: 73.36px;
     height: 62.54px;
   }
-  .hero-brand {
+  .home-hero-brand {
     gap: 10px;
   }
-  .hero-svg-2 {
+  .home-hero-svg-2 {
     display: none; /* hide desktop vector 1 */
   }
-  .hero-svg-mobile {
+  .home-hero-svg-mobile {
     display: block; /* show mobile version */
     width: 110vw;
     left: -5vw; /* small overscan to avoid edge gaps */
   }
-  .hero-svg-3 {
+  .home-hero-svg-3 {
     width: min(50vw, 1010px);
   }
 }
@@ -275,17 +275,17 @@
   }
 
   /* Typography adjustments */
-  .hero-title {
+  .home-hero-title {
     font-size: 75px;
     line-height: 92px;
   }
 
-  .hero-subtitle {
+  .home-hero-subtitle {
     font-size: clamp(14px, 3.2vw, 20px);
   }
 
   /* Glass button mobile styles */
-  .glass-button {
+  .home-glass-button {
     padding: 12px 32px;
     font-size: 16px;
     border-width: 0.5px;
@@ -295,7 +295,7 @@
 
   /* Hover styles will only apply on devices that support hover */
   @media (hover: hover) {
-    .glass-button:hover {
+    .home-glass-button:hover {
       transform: translateY(-1px);
       background: rgba(255, 255, 255, 0.1);
       box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15),
@@ -304,7 +304,7 @@
   }
 
   /* Active state for touch devices */
-  .glass-button:active {
+  .home-glass-button:active {
     transform: translateY(0);
     background: rgba(255, 255, 255, 0.05);
     box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1),
@@ -312,7 +312,7 @@
   }
 
   /* Glow effect sizing */
-  .hero-title::before {
+  .home-hero-title::before {
     width: 90vw;
     height: calc(90vw * 280 / 606);
     max-width: 450px;
@@ -320,32 +320,32 @@
   }
 
   /* Mobile layout adjustments */
-  .hero-logo {
+  .home-hero-logo {
     width: 60.36px;
     height: 57.44px;
   }
 
-  .hero-brand {
+  .home-hero-brand {
     gap: 8px;
   }
 
   /* Mobile SVG adjustments */
-  .hero-svg {
+  .home-hero-svg {
     width: 95vw;
   }
 
-  [class^="hero-svg"]:not([class$="-mobile"]) {
+  [class^="home-hero-svg"]:not([class$="-mobile"]) {
     display: none;
   }
 
-  .hero-svg-2-mobile {
+  .home-hero-svg-2-mobile {
     display: block;
     width: 125vw;
     left: -12vw;
     bottom: -8vh;
   }
 
-  .hero-svg-3-mobile {
+  .home-hero-svg-3-mobile {
     display: block;
     width: 95vw;
     right: -10vw;
@@ -358,27 +358,27 @@
 }
 
 @media (max-width: 480px) {
-  .hero-svg {
+  .home-hero-svg {
     display: none;
   }
-  .hero-svg-mobile {
+  .home-hero-svg-mobile {
     display: block;
     width: 120vw;
     left: -10vw;
   }
-  .hero-svg-2 {
+  .home-hero-svg-2 {
     display: none;
   }
-  .hero-svg-2-mobile {
+  .home-hero-svg-2-mobile {
     display: block;
     width: 140vw;
     left: -22vw;
     bottom: -12vh;
   }
-  .hero-svg-3 {
+  .home-hero-svg-3 {
     display: none;
   }
-  .hero-svg-3-mobile {
+  .home-hero-svg-3-mobile {
     display: block;
     width: 115vw;
     right: -20vw;
@@ -386,19 +386,19 @@
   }
 
   /* Keep same mobile sizing on smaller phones */
-  .hero-title {
+  .home-hero-title {
     font-size: 75px;
     line-height: 92px;
   }
   /* Keep the same mobile spec on small phones */
-  .hero-logo {
+  .home-hero-logo {
     width: 60.36px;
     height: 57.44px;
   }
-  .hero-brand {
+  .home-hero-brand {
     gap: 6px;
   }
-  .hero-subtitle {
+  .home-hero-subtitle {
     font-size: clamp(13px, 4vw, 18px);
   }
 }

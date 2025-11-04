@@ -11,7 +11,7 @@ export default function Home() {
 
   return (
     <div className="home-root">
-      <div className="hero-svg" aria-hidden="true">
+      <div className="home-hero-svg" aria-hidden="true">
         <svg
           width="1448"
           height="840"
@@ -51,7 +51,7 @@ export default function Home() {
         </svg>
       </div>
       {/* Mobile replacement for vector 1 */}
-      <div className="hero-svg-mobile" aria-hidden="true">
+      <div className="home-hero-svg-mobile" aria-hidden="true">
         <svg
           width="393"
           height="607"
@@ -90,7 +90,7 @@ export default function Home() {
           </defs>
         </svg>
       </div>
-      <div className="hero-svg-2" aria-hidden="true">
+      <div className="home-hero-svg-2" aria-hidden="true">
         <svg
           width="1813"
           height="536"
@@ -131,7 +131,7 @@ export default function Home() {
         </svg>
       </div>
       {/* Mobile replacement for vector 2 */}
-      <div className="hero-svg-2-mobile" aria-hidden="true">
+      <div className="home-hero-svg-2-mobile" aria-hidden="true">
         <svg
           width="393"
           height="467"
@@ -171,7 +171,7 @@ export default function Home() {
           </defs>
         </svg>
       </div>
-      <div className="hero-svg-3" aria-hidden="true">
+      <div className="home-hero-svg-3" aria-hidden="true">
         <svg
           width="1010"
           height="825"
@@ -211,7 +211,7 @@ export default function Home() {
         </svg>
       </div>
       {/* Mobile replacement for vector 3 */}
-      <div className="hero-svg-3-mobile" aria-hidden="true">
+      <div className="home-hero-svg-3-mobile" aria-hidden="true">
         <svg
           width="393"
           height="658"
@@ -252,10 +252,10 @@ export default function Home() {
         </svg>
       </div>
       {/* Centered hero brand */}
-      <div className="center-image-container">
-        <div className="hero-brand">
+      <div className="home-center-image-container">
+        <div className="home-hero-brand">
           <svg
-            className="hero-logo"
+            className="home-hero-logo"
             viewBox="0 0 75 63"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -269,9 +269,9 @@ export default function Home() {
               fill="#D81B60"
             />
           </svg>
-          <h1 className="hero-title">manslater</h1>
+          <h1 className="home-hero-title">manslater</h1>
         </div>
-        <button className="glass-button" onClick={handleClick}>
+        <button className="home-glass-button" onClick={handleClick}>
           TALK TO MANSLATER
         </button>
       </div>
