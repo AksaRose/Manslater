@@ -45,11 +45,23 @@ const Chat = () => {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to get response");
-      }
-
       const data = await response.json();
+
+      // Handle rate limit (429) or other errors
+      if (!response.ok) {
+        // Extract error message from response
+        const errorMessage = data.detail?.message || data.detail || "Failed to get response";
+        
+        // Add error message as AI response
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "ai",
+            content: errorMessage,
+          },
+        ]);
+        return;
+      }
 
       // Store session ID for future requests
       if (!sessionId) {

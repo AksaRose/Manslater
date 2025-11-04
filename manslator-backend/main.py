@@ -433,11 +433,22 @@ async def chat(
             hours_remaining = ttl // 3600
             minutes_remaining = (ttl % 3600) // 60
             
+            rate_limit_message = f"You have used all {CHAT_LIMIT_PER_DEVICE} chat invocations. Please try again in {hours_remaining}h {minutes_remaining}m."
+            
+            # Get or create session to save the rate limit message
+            session_id = request_body.session_id or f"session_{os.urandom(8).hex()}"
+            
+            # Save user message
+            redis_manager.save_chat_message(session_id, "user", request_body.message)
+            
+            # Save rate limit message as assistant response
+            redis_manager.save_chat_message(session_id, "assistant", rate_limit_message)
+            
             raise HTTPException(
                 status_code=429,
                 detail={
                     "error": "Rate limit exceeded",
-                    "message": f"You have used all {CHAT_LIMIT_PER_DEVICE} chat invocations. Please try again in {hours_remaining}h {minutes_remaining}m.",
+                    "message": rate_limit_message,
                     "current_usage": rate_info["current_usage"],
                     "limit": rate_info["limit"],
                     "reset_in_seconds": ttl,
