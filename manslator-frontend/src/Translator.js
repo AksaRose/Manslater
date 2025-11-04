@@ -3,19 +3,21 @@ import "./App.css";
 
 function Translator() {
   const [inputText, setInputText] = useState("");
-  const [translatedText, setTranslatedText] = useState("");
+  const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleTranslate = async () => {
     if (!inputText.trim()) {
-      setTranslatedText("Please enter some text to translate.");
       return;
     }
 
+    const newUserMessage = { text: inputText, sender: "user" };
+    setMessages((prevMessages) => [...prevMessages, newUserMessage]);
+    setInputText("");
     setIsLoading(true);
-    setTranslatedText(""); // Clear previous translation
+
     try {
-      const response = await fetch("https://manslater.onrender.com/translate", {
+      const response = await fetch("http://localhost:5001/translate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -24,13 +26,22 @@ function Translator() {
       });
       const data = await response.json();
       if (response.ok) {
-        setTranslatedText(data.translatedText);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: data.translatedText, sender: "manslater" },
+        ]);
       } else {
-        setTranslatedText(`Error: ${data.error || "Unknown error"}`);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: `Error: ${data.error || "Unknown error"}`, sender: "manslater" },
+        ]);
       }
     } catch (error) {
       console.error("Error translating text:", error);
-      setTranslatedText("Error: Could not reach the translation server.");
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: "Error: Could not reach the translation server.", sender: "manslater" },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -40,27 +51,41 @@ function Translator() {
     <div className="App">
       <header className="App-header">
         <h1>Manslater</h1>
-        <div className="translator-container">
-          <textarea
-            className="input-text"
-            placeholder="ex: I'm fine"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            disabled={isLoading}
-          ></textarea>
-          <button
-            className="translate-button"
-            onClick={handleTranslate}
-            disabled={isLoading}
-          >
-            {isLoading ? "Translating Fun..." : "Translate"}
-          </button>
-          {isLoading && <p className="loading-text">Wait, lemme fix it...</p>}
-          {!isLoading && translatedText && (
-            <div className="output-text">
-              <p>{translatedText}</p>
-            </div>
-          )}
+        <div className="chat-container">
+          <div className="messages-display">
+            {messages.map((msg, index) => (
+              <div key={index} className={`message-bubble ${msg.sender}`}>
+                <p>{msg.text}</p>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="message-bubble manslater loading">
+                <p>Wait, lemme fix it...</p>
+              </div>
+            )}
+          </div>
+          <div className="input-area">
+            <textarea
+              className="input-text"
+              placeholder="ex: I'm fine"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              disabled={isLoading}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleTranslate();
+                }
+              }}
+            ></textarea>
+            <button
+              className="translate-button"
+              onClick={handleTranslate}
+              disabled={isLoading}
+            >
+              {isLoading ? "Translating Fun..." : "Translate"}
+            </button>
+          </div>
         </div>
       </header>
     </div>

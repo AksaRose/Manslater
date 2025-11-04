@@ -1,0 +1,567 @@
+/* Home styles */
+.home-root {
+    position: relative;
+  }
+  
+  .hero-svg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* Scale the art responsively but cap at its natural size */
+    width: min(75vw, 1448px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none; /* don't block clicks */
+  }
+  
+  .hero-svg svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Mobile-only replacement for the first vector */
+  .hero-svg-mobile {
+    display: none; /* hidden on desktop */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hero-svg-mobile svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Second decorative SVG */
+  .hero-svg-2 {
+    position: fixed;
+    left: 0;
+    bottom: 0; /* anchor near bottom for depth */
+    width: min(85vw, 1813px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hero-svg-2 svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Mobile-only replacement for second vector */
+  .hero-svg-2-mobile {
+    display: none; /* hidden on desktop */
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hero-svg-2-mobile svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Third decorative SVG */
+  .hero-svg-3 {
+    position: fixed;
+    bottom: 0;
+    right: 0; /* place on the top-right for balance */
+    width: min(60vw, 1010px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hero-svg-3 svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Mobile-only replacement for third vector */
+  .hero-svg-3-mobile {
+    display: none; /* hidden on desktop */
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .hero-svg-3-mobile svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Centered PNG content */
+  .center-image-container {
+    position: fixed;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    z-index: 1; /* above decorative vectors */
+  }
+  
+  /* Brand row: logo + title */
+  .hero-brand {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+    padding: 0 0vw;
+  }
+  /* Remove extra margin inside the brand column */
+  .hero-brand .hero-title {
+    margin: 0;
+  }
+  
+  /* Default (desktop) logo size per spec ~73.36x62.54 */
+  .hero-logo {
+    width: 73.36px;
+    height: 62.54px; /* set explicit height to match design */
+    flex: 0 0 auto;
+    gap: 0;
+  }
+  
+  .center-image {
+    display: block;
+    width: min(60vw, 520px);
+    height: auto;
+  }
+  
+  /* Centered hero text */
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 4vw;
+  }
+  
+  .hero-title {
+    font-family: "Shopie", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 120px;
+    line-height: 147px;
+    color: #d81b60;
+    text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
+    margin: 0 0 12px 0;
+  }
+  
+  .hero-subtitle {
+    font-family: "Quicksand", sans-serif;
+    font-size: clamp(14px, 2.6vw, 22px);
+    color: #444;
+    margin: 0;
+  }
+  .glass-button {
+    padding: 16px 48px;
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "Trivia Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  .glass-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+  }
+  
+  .glass-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  }
+  
+  .glass-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  }
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .hero-svg {
+      width: min(85vw, 1448px);
+    }
+    /* keep desktop spec on tablets unless overridden below */
+    .hero-logo {
+      width: 73.36px;
+      height: 62.54px;
+    }
+    .hero-brand {
+      gap: 10px;
+    }
+    .hero-svg-2 {
+      display: none; /* hide desktop vector 1 */
+    }
+    .hero-svg-mobile {
+      display: block; /* show mobile version */
+      width: 110vw;
+      left: -5vw; /* small overscan to avoid edge gaps */
+    }
+    .hero-svg-3 {
+      width: min(50vw, 1010px);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    /* Avoid accidental horizontal scroll on small screens */
+    body {
+      overflow-x: hidden;
+    }
+  
+    .hero-title {
+      font-size: 75px;
+      line-height: 92px;
+    }
+  
+    /* Mobile/tablet logo size per spec ~60.36x57.44 */
+    .hero-logo {
+      width: 60.36px;
+      height: 57.44px;
+    }
+    .hero-brand {
+      gap: 8px;
+    }
+  
+    .hero-svg {
+      width: 95vw;
+    }
+    .hero-svg-2 {
+      display: none;
+    }
+    .hero-svg-2-mobile {
+      display: block;
+      width: 125vw;
+      left: -12vw;
+      bottom: -8vh;
+    }
+    .hero-svg-3 {
+      display: none;
+    }
+    .hero-svg-3-mobile {
+      display: block;
+      width: 95vw;
+      right: -10vw;
+      bottom: -5vh;
+    }
+  
+    .center-image {
+      width: min(75vw, 460px);
+    }
+    /* Ensure mobile uses fixed size per spec */
+    .hero-title {
+      font-size: 75px;
+      line-height: 92px;
+    }
+    .hero-subtitle {
+      font-size: clamp(14px, 3.2vw, 20px);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hero-svg {
+      display: none;
+    }
+    .hero-svg-mobile {
+      display: block;
+      width: 120vw;
+      left: -10vw;
+    }
+    .hero-svg-2 {
+      display: none;
+    }
+    .hero-svg-2-mobile {
+      display: block;
+      width: 140vw;
+      left: -22vw;
+      bottom: -12vh;
+    }
+    .hero-svg-3 {
+      display: none;
+    }
+    .hero-svg-3-mobile {
+      display: block;
+      width: 115vw;
+      right: -20vw;
+      bottom: -8vh;
+    }
+  
+    /* Keep same mobile sizing on smaller phones */
+    .hero-title {
+      font-size: 75px;
+      line-height: 92px;
+    }
+    /* Keep the same mobile spec on small phones */
+    .hero-logo {
+      width: 60.36px;
+      height: 57.44px;
+    }
+    .hero-brand {
+      gap: 6px;
+    }
+    .hero-subtitle {
+      font-size: clamp(13px, 4vw, 18px);
+    }
+  }
+  .convo-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 800px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .convo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .convo-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  
+  .clear-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .clear-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .messages-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .messages-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+  
+  .messages-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+  }
+  
+  .messages-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+  }
+  
+  .message {
+    display: flex;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .user-message {
+    justify-content: flex-end;
+  }
+  
+  .ai-message {
+    justify-content: flex-start;
+  }
+  
+  .message-content {
+    max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 18px;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
+  
+  .user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .ai-message .message-content {
+    background: white;
+    color: #333;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+  }
+  
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #999;
+    animation: typing 1.4s infinite;
+  }
+  
+  .typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.7;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+  
+  .input-container {
+    display: flex;
+    gap: 10px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .input-container textarea {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    font-size: 15px;
+    resize: none;
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    max-height: 120px;
+  }
+  
+  .input-container textarea:focus {
+    border-color: rgba(255, 255, 255, 0.6);
+    background: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .input-container textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .send-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  }
+  
+  .send-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  }
+  
+  .send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .send-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }  

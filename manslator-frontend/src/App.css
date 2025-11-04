@@ -22,11 +22,11 @@ body {
 
 .App-header {
   background-color: #feabc1;
-  min-height: 100dvh; /* Use dynamic viewport height for better mobile support */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the top */
   font-size: calc(10px + 2vmin);
   color: #333;
   padding: 20px;
@@ -37,71 +37,103 @@ h1 {
   font-family: "Pacifico", cursive;
   font-size: 4rem;
   color: #880e4f;
-  margin-bottom: 30px;
+  margin-bottom: 20px; /* Reduced margin-bottom */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 0; /* Ensure title is at the very top */
 }
 
-.translator-container {
+.chat-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
   width: 90%;
   max-width: 700px;
   background-color: rgba(255, 255, 255, 0.9);
-  padding: 30px;
+  padding: 20px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease-in-out;
+  height: 70vh; /* Set a fixed height for the chat container */
+  overflow-y: auto; /* Enable scrolling for messages */
+  justify-content: flex-end; /* Push content to the bottom */
+  position: relative;
 }
 
-.translator-container:hover {
-  transform: translateY(-5px);
+.messages-display {
+  flex-grow: 1; /* Allow messages to take up available space */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Keep messages at the bottom of the display area */
+  gap: 10px;
+  padding-bottom: 10px; /* Add some padding at the bottom */
 }
 
-.input-text,
-.output-text {
-  width: 100%;
-  padding: 15px;
-  border-radius: 10px;
+.message-bubble {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 1rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.message-bubble.user {
+  background-color: #4285F4;
+  color: white;
+  align-self: flex-end; /* Align user messages to the right */
+  border-bottom-right-radius: 5px;
+}
+
+.message-bubble.manslater {
+  background-color: #f0f0f0;
+  color: #333;
+  align-self: flex-start; /* Align manslater messages to the left */
+  border-bottom-left-radius: 5px;
+}
+
+.message-bubble.manslater.loading {
+  background-color: #ffe0b2; /* Light orange for loading */
+  font-style: italic;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+
+.input-text {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border-radius: 20px;
   border: 2px solid #ff80ab;
   background-color: #fff;
   color: #333;
-  font-size: 1.1rem;
-  min-height: 120px;
-  resize: vertical;
+  font-size: 1rem;
+  min-height: 50px;
+  resize: none; /* Disable vertical resize for input */
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: border-color 0.3s ease;
 }
 
-.input-text:focus,
-.output-text:focus {
+.input-text:focus {
   outline: none;
   border-color: #e91e63;
-}
-
-.output-text {
-  text-align: left;
-  background-color: #f8f8f8;
-  color: #555;
-  cursor: default;
-  min-height: 50px;
-  padding: 15px;
-  border-radius: 10px;
-  border: 2px solid #ff80ab;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .translate-button {
   background-color: #e91e63;
   color: white;
   border: none;
-  padding: 15px 30px;
-  border-radius: 25px;
+  padding: 10px 20px;
+  border-radius: 20px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .translate-button:hover {
@@ -114,74 +146,69 @@ h1 {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.loading-text {
-  color: #e91e63;
-  font-style: italic;
-  margin-top: 10px;
-}
 
 @media (max-width: 600px) {
   h1 {
     font-size: 2.5rem;
   }
 
-  .translator-container {
+  .chat-container {
     width: 95%;
-    padding: 20px;
+    padding: 15px;
+    height: 60vh;
+  }
+
+  .message-bubble {
+    font-size: 0.9rem;
+    padding: 8px 12px;
   }
 
   .input-text,
-  .output-text,
   .translate-button {
-    font-size: 1rem;
-    padding: 12px;
-    width: 100%; /* Ensure full width on mobile */
-  }
-
-  .translate-button {
-    padding: 12px 25px;
+    font-size: 0.9rem;
+    padding: 8px 15px;
   }
 }
 
 @media (max-width: 400px) {
   h1 {
     font-size: 2rem;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
   }
 
-  .translator-container {
-    padding: 15px;
+  .chat-container {
+    padding: 10px;
+    height: 55vh;
+  }
+
+  .message-bubble {
+    font-size: 0.8rem;
+    padding: 6px 10px;
   }
 
   .input-text,
-  .output-text,
   .translate-button {
-    font-size: 0.9rem;
-    padding: 10px;
-    width: 100%; /* Ensure full width on mobile */
-  }
-
-  .translate-button {
-    padding: 10px 20px;
+    font-size: 0.8rem;
+    padding: 6px 12px;
   }
 }
 
 .buy-me-a-coffee {
-  margin-top: 80px; /* Further increased margin to move it down */
-  position: absolute; /* Use absolute positioning */
-  bottom: 20px; /* Position at the bottom */
-  left: 50%; /* Center horizontally */
-  transform: translateX(-50%); /* Adjust for perfect centering */
+  margin-top: 20px; /* Adjusted margin for new layout */
+  position: relative; /* Changed to relative positioning */
+  bottom: auto;
+  left: auto;
+  transform: none;
 }
 
 .buy-me-a-coffee a {
   display: inline-block;
-  background-color: #ffdd00; /* Reverted to Buy Me a Coffee yellow */
-  color: #1a1a1a; /* Changed text color for contrast with yellow */
-  padding: 8px 18px; /* Smaller padding */
-  border-radius: 20px; /* Slightly smaller border-radius */
+  background-color: #ffdd00;
+  color: #1a1a1a;
+  padding: 8px 18px;
+  border-radius: 20px;
   text-decoration: none;
-  font-size: 0.9rem; /* Smaller font size */
+  font-size: 0.9rem;
   font-weight: bold;
   transition: background-color 0.3s ease, transform 0.2s ease,
     box-shadow 0.3s ease;
