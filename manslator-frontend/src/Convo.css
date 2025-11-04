@@ -78,6 +78,8 @@
 .convo-container {
   width: calc(100vw - 32px);
   max-height: calc(100vh - 60px); /* Reduced top space */
+  position: fixed;
+  overflow: hidden;
 }
 /* Third decorative SVG */
 .hero-svg-3 {
@@ -427,11 +429,15 @@
 .messages-container {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-height: calc(70vh - 120px); /* Account for input area and padding */
+  height: calc(100vh - 180px);
+  -webkit-overflow-scrolling: touch;
+  justify-content: flex-start; /* Start content from top */
+  align-items: stretch; /* Stretch items to full width */
 }
 
 .messages-container::-webkit-scrollbar {

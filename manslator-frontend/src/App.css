@@ -12,7 +12,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #feabc1;
-  min-height: 100vh; /* Ensure body takes full viewport height */
+  height: 100vh; /* Use fixed height instead of min-height */
+  overflow: hidden; /* Disable page scrolling */
+  position: fixed; /* Prevent bounce effects on iOS */
+  width: 100%;
   touch-action: manipulation; /* Improve touch responsiveness */
 }
 
@@ -22,15 +25,16 @@ body {
 
 .App-header {
   background-color: #feabc1;
-  min-height: 100dvh;
+  height: 100vh; /* Use fixed height */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Align items to the top */
+  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: #333;
   padding: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Prevent scrolling */
 }
 
 h1 {
@@ -52,19 +56,19 @@ h1 {
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  height: 70vh; /* Set a fixed height for the chat container */
-  overflow: hidden; /* Contains scrolling messages within */
-  justify-content: flex-end; /* Push content to the bottom */
+  height: 70vh;
+  overflow: hidden;
+  justify-content: flex-start; /* Start content from top */
   position: relative;
 }
 
 .messages-display {
-  flex-grow: 1; /* Allow messages to take up available space */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* Keep messages at the bottom of the display area */
+  justify-content: flex-start; /* Start messages from top */
   gap: 10px;
-  padding-bottom: 10px; /* Add some padding at the bottom */
+  padding-bottom: 10px;
 }
 
 .message-wrapper {
