@@ -9,3 +9,4 @@ langchain-openai
 langgraph
 together
 pydantic
+uvicorn
