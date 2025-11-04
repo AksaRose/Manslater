@@ -1,8 +1,11 @@
-Flask
-Flask-Cors
 gunicorn
 python-dotenv
 requests
 transformers
 torch
+fastapi
+uvicorn[standard]
+langchain-openai
+langgraph
 together
+pydantic
