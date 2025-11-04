@@ -14,98 +14,58 @@
   pointer-events: none; /* don't block clicks */
 }
 
-.hero-svg svg {
+/* Common SVG styles */
+[class^="hero-svg"] {
+  position: fixed;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+[class^="hero-svg"] svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Mobile-only replacement for the first vector */
-.hero-svg-mobile {
-  display: none; /* hidden on desktop */
-  position: fixed;
+/* Desktop SVGs */
+.hero-svg {
   top: 0;
   left: 0;
-  width: 100vw;
-  height: auto;
-  z-index: 0;
-  pointer-events: none;
+  width: min(75vw, 1448px);
 }
 
-.hero-svg-mobile svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Second decorative SVG */
 .hero-svg-2 {
-  position: fixed;
   left: 0;
-  bottom: 0; /* anchor near bottom for depth */
+  bottom: 0;
   width: min(85vw, 1813px);
-  height: auto;
-  z-index: 0;
-  pointer-events: none;
 }
 
-.hero-svg-2 svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Mobile-only replacement for second vector */
-.hero-svg-2-mobile {
-  display: none; /* hidden on desktop */
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100vw;
-  height: auto;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hero-svg-2-mobile svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Third decorative SVG */
 .hero-svg-3 {
-  position: fixed;
-  bottom: 0;
-  right: 0; /* place on the top-right for balance */
-  width: min(60vw, 1010px);
-  height: auto;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.hero-svg-3 svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-/* Mobile-only replacement for third vector */
-.hero-svg-3-mobile {
-  display: none; /* hidden on desktop */
-  position: fixed;
   bottom: 0;
   right: 0;
-  width: 100vw;
-  height: auto;
-  z-index: 0;
-  pointer-events: none;
+  width: min(60vw, 1010px);
 }
 
-.hero-svg-3-mobile svg {
-  display: block;
-  width: 100%;
-  height: auto;
+/* Mobile SVGs */
+[class$="-mobile"] {
+  display: none;
+  width: 100vw;
+}
+
+.hero-svg-mobile {
+  top: 0;
+  left: 0;
+}
+
+.hero-svg-2-mobile {
+  left: 0;
+  bottom: 0;
+}
+
+.hero-svg-3-mobile {
+  bottom: 0;
+  right: 0;
 }
 
 /* Centered PNG content */
@@ -128,6 +88,8 @@
   justify-content: center;
   gap: 0px;
   padding: 0 0vw;
+  position: relative;
+  z-index: 4; /* Ensure brand container stays above other elements */
 }
 /* Remove extra margin inside the brand column */
 .hero-brand .hero-title {
@@ -140,6 +102,8 @@
   height: 62.54px; /* set explicit height to match design */
   flex: 0 0 auto;
   gap: 0;
+  position: relative;
+  z-index: 5; /* Highest z-index to ensure logo stays on top */
 }
 
 .center-image {
@@ -156,9 +120,12 @@
   justify-content: center;
   text-align: center;
   padding: 0 4vw;
+  position: relative;
+  z-index: 2;
 }
 
 .hero-title {
+  position: relative;
   font-family: "Shopie", sans-serif;
   font-style: normal;
   font-weight: 400;
@@ -167,6 +134,23 @@
   color: #d81b60;
   text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
   margin: 0 0 12px 0;
+  z-index: 3;
+}
+
+.hero-title::before {
+  content: "";
+  position: absolute;
+  width: 606px;
+  height: 280px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url("./images/blur-effect.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .hero-subtitle {
@@ -176,38 +160,39 @@
   margin: 0;
 }
 .glass-button {
-  padding: 16px 48px;
-  font-size: 18px;
-  font-weight: 700;
-  font-family: "Trivia Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  color: rgba(255, 255, 255, 0.9);
-  border: none;
-  border-radius: 30px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  margin-top: 20px;
+  /* Layout */
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  padding: 14px 25px;
+  margin-top: 0;
+
+  /* Typography */
+  font-family: "Trivia Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 25px;
   font-weight: 600;
+  color: rgb(255, 255, 255);
+
+  /* Visual */
+  border-radius: 30px;
+  border: 0.1px solid rgba(255, 255, 255, 0.527);
+  background: rgba(255, 255, 255, 0.066);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+
+  /* Behavior */
+  cursor: pointer;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
 }
 
 .glass-button::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
+  inset: 0 0 50% 0;
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.2) 0%,
@@ -219,8 +204,36 @@
 .glass-button:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 40px 0 rgba(210, 208, 208, 0.25),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile styles for glass button */
+
+@media screen and (max-width: 768px) {
+  .glass-button {
+    padding: 17px 18px;
+    font-size: 23px;
+    margin-top: 1px;
+    border-width: 0.5px;
+    border-color: rgb(220, 220, 220);
+    box-shadow: 0 4px 16px 0 rgba(59, 59, 59, 0.2),
+      inset 0 1px 0 0 rgba(250, 250, 250, 0.3);
+  }
+
+  .glass-button:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-button:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  }
 }
 
 .glass-button:active {
@@ -228,6 +241,7 @@
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
 }
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .hero-svg {
@@ -255,40 +269,82 @@
 }
 
 @media (max-width: 768px) {
-  /* Avoid accidental horizontal scroll on small screens */
+  /* Prevent horizontal scroll */
   body {
     overflow-x: hidden;
   }
 
+  /* Typography adjustments */
   .hero-title {
     font-size: 75px;
     line-height: 92px;
   }
 
-  /* Mobile/tablet logo size per spec ~60.36x57.44 */
+  .hero-subtitle {
+    font-size: clamp(14px, 3.2vw, 20px);
+  }
+
+  /* Glass button mobile styles */
+  .glass-button {
+    padding: 12px 32px;
+    font-size: 16px;
+    border-width: 0.5px;
+    -webkit-tap-highlight-color: transparent; /* Remove default mobile tap highlight */
+    touch-action: manipulation; /* Optimize for touch */
+  }
+
+  /* Hover styles will only apply on devices that support hover */
+  @media (hover: hover) {
+    .glass-button:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  /* Active state for touch devices */
+  .glass-button:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  }
+
+  /* Glow effect sizing */
+  .hero-title::before {
+    width: 90vw;
+    height: calc(90vw * 280 / 606);
+    max-width: 450px;
+    max-height: 208px;
+  }
+
+  /* Mobile layout adjustments */
   .hero-logo {
     width: 60.36px;
     height: 57.44px;
   }
+
   .hero-brand {
     gap: 8px;
   }
 
+  /* Mobile SVG adjustments */
   .hero-svg {
     width: 95vw;
   }
-  .hero-svg-2 {
+
+  [class^="hero-svg"]:not([class$="-mobile"]) {
     display: none;
   }
+
   .hero-svg-2-mobile {
     display: block;
     width: 125vw;
     left: -12vw;
     bottom: -8vh;
   }
-  .hero-svg-3 {
-    display: none;
-  }
+
   .hero-svg-3-mobile {
     display: block;
     width: 95vw;
@@ -298,14 +354,6 @@
 
   .center-image {
     width: min(75vw, 460px);
-  }
-  /* Ensure mobile uses fixed size per spec */
-  .hero-title {
-    font-size: 75px;
-    line-height: 92px;
-  }
-  .hero-subtitle {
-    font-size: clamp(14px, 3.2vw, 20px);
   }
 }
 
