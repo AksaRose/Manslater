@@ -1,567 +1,721 @@
 /* Home styles */
 .home-root {
-    position: relative;
-  }
-  
+  position: relative;
+}
+
+.hero-svg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Scale the art responsively but cap at its natural size */
+  width: min(75vw, 1448px);
+  height: auto;
+  z-index: 0;
+  /* leave room for hero at top; increase this to make chat taller */
+  max-height: calc(100vh - 80px);
+}
+
+.hero-svg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for the first vector */
+.hero-svg-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Second decorative SVG */
+.hero-svg-2 {
+  position: fixed;
+  left: 0;
+  bottom: 0; /* anchor near bottom for depth */
+  width: min(85vw, 1813px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-2 svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for second vector */
+.hero-svg-2-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-2-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* On small screens give more vertical space to the chat panel */
+.convo-container {
+  width: calc(100vw - 32px);
+  max-height: calc(100vh - 120px);
+}
+/* Third decorative SVG */
+.hero-svg-3 {
+  position: fixed;
+  bottom: 0;
+  right: 0; /* place on the top-right for balance */
+  width: min(60vw, 1010px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-3 svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mobile-only replacement for third vector */
+.hero-svg-3-mobile {
+  display: none; /* hidden on desktop */
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100vw;
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-svg-3-mobile svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Centered PNG content */
+.center-image-container {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  flex-wrap: nowrap; /* prevent wrapping that causes layout shifts */
+  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start; /* move content to top */
+  padding-top: 20px; /* reduced top padding on desktop so branding isn't pushed too far down */
+  gap: 10px; /* space between brand and chat */
+  z-index: 1; /* above decorative vectors */
+  overflow-y: auto; /* allow scrolling if content is too tall */
+  overflow-x: hidden; /* prevent horizontal scroll */
+}
+
+/* Brand row: logo + title */
+.hero-brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0px;
+  padding: 0 0vw;
+  /* Float brand to the top center of the viewport */
+  position: fixed;
+  top: 4px; /* nudge brand slightly higher on desktop */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25; /* above SVGs and other UI elements */
+}
+/* Remove extra margin inside the brand column */
+.hero-brand .hero-title {
+  margin: 0;
+}
+
+/* Default (desktop) logo size per spec ~73.36x62.54 */
+.hero-logo {
+  width: 34.36px;
+  height: 25.54px; /* set explicit height to match design */
+  flex: 0 0 auto;
+  gap: 0;
+}
+
+.center-image {
+  display: block;
+  width: min(20vw, 520px);
+  height: auto;
+}
+
+/* Centered hero text */
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 1vw;
+}
+
+.hero-title {
+  font-family: "Shopie", sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 40px;
+  line-height: 147px;
+  color: #d81b60;
+  text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
+  margin-top: 12px;
+}
+
+.hero-subtitle {
+  font-family: "Quicksand", sans-serif;
+  font-size: clamp(14px, 2.6vw, 22px);
+  color: #444;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
   .hero-svg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    /* Scale the art responsively but cap at its natural size */
-    width: min(75vw, 1448px);
-    height: auto;
-    z-index: 0;
-    pointer-events: none; /* don't block clicks */
+    width: min(85vw, 1448px);
   }
-  
-  .hero-svg svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Mobile-only replacement for the first vector */
-  .hero-svg-mobile {
-    display: none; /* hidden on desktop */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: auto;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  .hero-svg-mobile svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Second decorative SVG */
-  .hero-svg-2 {
-    position: fixed;
-    left: 0;
-    bottom: 0; /* anchor near bottom for depth */
-    width: min(85vw, 1813px);
-    height: auto;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  .hero-svg-2 svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Mobile-only replacement for second vector */
-  .hero-svg-2-mobile {
-    display: none; /* hidden on desktop */
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100vw;
-    height: auto;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  .hero-svg-2-mobile svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Third decorative SVG */
-  .hero-svg-3 {
-    position: fixed;
-    bottom: 0;
-    right: 0; /* place on the top-right for balance */
-    width: min(60vw, 1010px);
-    height: auto;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  .hero-svg-3 svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Mobile-only replacement for third vector */
-  .hero-svg-3-mobile {
-    display: none; /* hidden on desktop */
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 100vw;
-    height: auto;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  .hero-svg-3-mobile svg {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  
-  /* Centered PNG content */
-  .center-image-container {
-    position: fixed;
-    inset: 0; /* top:0; right:0; bottom:0; left:0 */
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    z-index: 1; /* above decorative vectors */
-  }
-  
-  /* Brand row: logo + title */
-  .hero-brand {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0px;
-    padding: 0 0vw;
-  }
-  /* Remove extra margin inside the brand column */
-  .hero-brand .hero-title {
-    margin: 0;
-  }
-  
-  /* Default (desktop) logo size per spec ~73.36x62.54 */
+  /* keep desktop spec on tablets unless overridden below */
   .hero-logo {
     width: 73.36px;
-    height: 62.54px; /* set explicit height to match design */
-    flex: 0 0 auto;
-    gap: 0;
+    height: 62.54px;
   }
-  
-  .center-image {
-    display: block;
-    width: min(60vw, 520px);
-    height: auto;
-  }
-  
-  /* Centered hero text */
-  .hero-text {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 0 4vw;
-  }
-  
-  .hero-title {
-    font-family: "Shopie", sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 120px;
-    line-height: 147px;
-    color: #d81b60;
-    text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
-    margin: 0 0 12px 0;
-  }
-  
-  .hero-subtitle {
-    font-family: "Quicksand", sans-serif;
-    font-size: clamp(14px, 2.6vw, 22px);
-    color: #444;
-    margin: 0;
-  }
-  .glass-button {
-    padding: 16px 48px;
-    font-size: 18px;
-    font-weight: 700;
-    font-family: "Trivia Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
-      sans-serif;
-    color: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1.5px solid rgba(255, 255, 255, 0.2);
-    font-weight: 600;
-    overflow: hidden;
-    background: rgba(0, 0, 0, 0);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    pointer-events: none;
-  }
-  
-  .glass-button:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
-  }
-  
-  .glass-button:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
-  }
-  /* Responsive adjustments */
-  @media (max-width: 1024px) {
-    .hero-svg {
-      width: min(85vw, 1448px);
-    }
-    /* keep desktop spec on tablets unless overridden below */
-    .hero-logo {
-      width: 73.36px;
-      height: 62.54px;
-    }
-    .hero-brand {
-      gap: 10px;
-    }
-    .hero-svg-2 {
-      display: none; /* hide desktop vector 1 */
-    }
-    .hero-svg-mobile {
-      display: block; /* show mobile version */
-      width: 110vw;
-      left: -5vw; /* small overscan to avoid edge gaps */
-    }
-    .hero-svg-3 {
-      width: min(50vw, 1010px);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    /* Avoid accidental horizontal scroll on small screens */
-    body {
-      overflow-x: hidden;
-    }
-  
-    .hero-title {
-      font-size: 75px;
-      line-height: 92px;
-    }
-  
-    /* Mobile/tablet logo size per spec ~60.36x57.44 */
-    .hero-logo {
-      width: 60.36px;
-      height: 57.44px;
-    }
-    .hero-brand {
-      gap: 8px;
-    }
-  
-    .hero-svg {
-      width: 95vw;
-    }
-    .hero-svg-2 {
-      display: none;
-    }
-    .hero-svg-2-mobile {
-      display: block;
-      width: 125vw;
-      left: -12vw;
-      bottom: -8vh;
-    }
-    .hero-svg-3 {
-      display: none;
-    }
-    .hero-svg-3-mobile {
-      display: block;
-      width: 95vw;
-      right: -10vw;
-      bottom: -5vh;
-    }
-  
-    .center-image {
-      width: min(75vw, 460px);
-    }
-    /* Ensure mobile uses fixed size per spec */
-    .hero-title {
-      font-size: 75px;
-      line-height: 92px;
-    }
-    .hero-subtitle {
-      font-size: clamp(14px, 3.2vw, 20px);
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .hero-svg {
-      display: none;
-    }
-    .hero-svg-mobile {
-      display: block;
-      width: 120vw;
-      left: -10vw;
-    }
-    .hero-svg-2 {
-      display: none;
-    }
-    .hero-svg-2-mobile {
-      display: block;
-      width: 140vw;
-      left: -22vw;
-      bottom: -12vh;
-    }
-    .hero-svg-3 {
-      display: none;
-    }
-    .hero-svg-3-mobile {
-      display: block;
-      width: 115vw;
-      right: -20vw;
-      bottom: -8vh;
-    }
-  
-    /* Keep same mobile sizing on smaller phones */
-    .hero-title {
-      font-size: 75px;
-      line-height: 92px;
-    }
-    /* Keep the same mobile spec on small phones */
-    .hero-logo {
-      width: 60.36px;
-      height: 57.44px;
-    }
-    .hero-brand {
-      gap: 6px;
-    }
-    .hero-subtitle {
-      font-size: clamp(13px, 4vw, 18px);
-    }
-  }
-  .convo-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    max-width: 800px;
-    margin: 0 auto;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .convo-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .convo-header h2 {
-    color: white;
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-  }
-  
-  .clear-btn {
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s ease;
-  }
-  
-  .clear-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-  }
-  
-  .messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .messages-container::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .messages-container::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  
-  .messages-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-  }
-  
-  .messages-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.4);
-  }
-  
-  .message {
-    display: flex;
-    animation: slideIn 0.3s ease-out;
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .user-message {
-    justify-content: flex-end;
-  }
-  
-  .ai-message {
-    justify-content: flex-start;
-  }
-  
-  .message-content {
-    max-width: 70%;
-    padding: 12px 18px;
-    border-radius: 18px;
-    line-height: 1.5;
-    word-wrap: break-word;
-  }
-  
-  .user-message .message-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-bottom-right-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .ai-message .message-content {
-    background: white;
-    color: #333;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  }
-  
-  .typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 8px 0;
-  }
-  
-  .typing-indicator span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #999;
-    animation: typing 1.4s infinite;
-  }
-  
-  .typing-indicator span:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  
-  .typing-indicator span:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-  
-  @keyframes typing {
-    0%, 60%, 100% {
-      transform: translateY(0);
-      opacity: 0.7;
-    }
-    30% {
-      transform: translateY(-10px);
-      opacity: 1;
-    }
-  }
-  
-  .input-container {
-    display: flex;
+  .hero-brand {
     gap: 10px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
-  .input-container textarea {
-    flex: 1;
-    padding: 12px 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    font-size: 15px;
-    resize: none;
-    outline: none;
-    background: rgba(255, 255, 255, 0.95);
-    color: #333;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    max-height: 120px;
+  .hero-svg-2 {
+    display: none; /* hide desktop vector 1 */
   }
-  
-  .input-container textarea:focus {
-    border-color: rgba(255, 255, 255, 0.6);
-    background: white;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  .hero-svg-mobile {
+    display: block; /* show mobile version */
+    width: 110vw;
+    left: -5vw; /* small overscan to avoid edge gaps */
   }
-  
-  .input-container textarea:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  .hero-svg-3 {
+    width: min(50vw, 1010px);
   }
-  
-  .send-btn {
-    padding: 12px 28px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 24px;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* For very small phones, place the BMC button at the top-right and keep
+   the popup anchored directly below it so the message appears bundled. */
+@media (max-width: 480px) {
+  #bmc-wbtn {
+    top: 20px !important;
+    right: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
+    z-index: 99999 !important;
   }
-  
-  .send-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+
+  .bmc-popup,
+  .bmc-modal,
+  .bmc-widget,
+  .bmc-overlay,
+  .bmc-tooltip,
+  #bmc-wbtn-modal,
+  .bmc-floating,
+  .bmc-inline {
+    position: fixed !important;
+    top: 64px !important; /* directly below the button */
+    right: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    max-width: 92vw !important;
+    width: auto !important;
+    z-index: 99998 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
   }
-  
-  .send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
+}
+
+@media (max-width: 768px) {
+  /* Avoid accidental horizontal scroll on small screens */
+  body {
+    overflow-x: hidden;
   }
-  
-  .send-btn:active:not(:disabled) {
+
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+
+  /* Mobile/tablet logo size per spec ~60.36x57.44 */
+  .hero-logo {
+    width: 60.36px;
+    height: 57.44px;
+  }
+  .hero-brand {
+    gap: 8px;
+  }
+
+  .hero-svg {
+    width: 95vw;
+  }
+  .hero-svg-2 {
+    display: none;
+  }
+  .hero-svg-2-mobile {
+    display: block;
+    width: 125vw;
+    left: -12vw;
+    bottom: -8vh;
+  }
+  .hero-svg-3 {
+    display: none;
+  }
+  .hero-svg-3-mobile {
+    display: block;
+    width: 95vw;
+    right: -10vw;
+    bottom: -5vh;
+  }
+
+  .center-image {
+    width: min(75vw, 460px);
+  }
+  /* Ensure hero sits comfortably at top on mobile */
+  .center-image-container {
+    padding-top: 6vh;
+  }
+  /* Ensure mobile uses fixed size per spec */
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+  .hero-subtitle {
+    font-size: clamp(14px, 3.2vw, 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-svg {
+    display: none;
+  }
+  .hero-svg-mobile {
+    display: block;
+    width: 120vw;
+    left: -10vw;
+  }
+  .hero-svg-2 {
+    display: none;
+  }
+  .hero-svg-2-mobile {
+    display: block;
+    width: 140vw;
+    left: -22vw;
+    bottom: -12vh;
+  }
+  .hero-svg-3 {
+    display: none;
+  }
+  .hero-svg-3-mobile {
+    display: block;
+    width: 115vw;
+    right: -20vw;
+    bottom: -8vh;
+  }
+
+  /* Keep same mobile sizing on smaller phones */
+  .hero-title {
+    font-size: 75px;
+    line-height: 92px;
+  }
+  /* Keep the same mobile spec on small phones */
+  .hero-logo {
+    width: 60.36px;
+    height: 57.44px;
+  }
+  .hero-brand {
+    gap: 6px;
+  }
+  .hero-subtitle {
+    font-size: clamp(13px, 4vw, 18px);
+  }
+}
+.convo-container {
+  display: flex;
+  flex-direction: column;
+  /* responsive width and centered layout */
+  width: min(800px, 92vw);
+  max-width: 800px;
+  height: auto;
+  max-height: calc(
+    100vh - 220px
+  ); /* leave room for hero at top and input at bottom */
+  background: rgba(255, 255, 255, 0.301);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff; /* fixed from font-color */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px rgba(255, 255, 255, 0.25);
+  margin-top: 70px; /* push chat lower on desktop */
+  margin-bottom: 20px; /* space above fixed input */
+}
+
+.convo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.convo-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.clear-btn {
+  margin-left: auto;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.messages-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.message {
+  display: flex;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
-  }  
+  }
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.message-content {
+  max-width: 70%;
+  padding: 12px 18px;
+  border-radius: 18px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.user-message .message-content {
+  background: white;
+  color: rgb(0, 0, 0);
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ai-message .message-content {
+  background: white;
+  color: #000000;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 8px 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #999;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Fixed input container at bottom of viewport - floating style */
+.input-container-fixed {
+  position: fixed;
+  bottom: 20px; /* float above bottom edge */
+  left: 50%; /* center horizontally */
+  transform: translateX(-50%); /* center offset */
+  z-index: 10; /* above chat container and hero */
+  width: min(680px, 86vw);
+  max-width: 680px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+}
+
+.input-container-fixed textarea {
+  flex: 1;
+  padding: 8px 44px 8px 12px; /* smaller padding for compact layout */
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  resize: none;
+  outline: none;
+  background: transparent;
+  color: #333;
+  font-family: "Inter", sans-serif;
+  transition: all 0.3s ease;
+  max-height: 100px;
+}
+
+.input-container-fixed textarea:focus {
+  background: transparent;
+}
+
+.input-container-fixed textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Send arrow button positioned inside the input box */
+.input-container-fixed .send-arrow-btn {
+  position: absolute;
+  right: 20px; /* align with container padding */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: #d81b60;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+}
+
+.input-container-fixed .send-arrow-btn:hover:not(:disabled) {
+  background: #c2185b;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
+}
+
+.input-container-fixed .send-arrow-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #999;
+  box-shadow: none;
+}
+
+.input-container-fixed .send-arrow-btn:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.input-container-fixed .send-arrow-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Old input-container styles - keep for backwards compatibility if needed elsewhere */
+.input-container {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px; /* adjust padding to match --input-height */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative; /* for absolute positioning of the arrow button */
+  bottom: 0;
+  z-index: 3;
+  flex: 0 0 auto;
+}
+
+.input-container textarea {
+  flex: 1;
+  padding: 12px 50px 12px 16px; /* add right padding for arrow button */
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  max-height: 120px;
+}
+
+.input-container textarea:focus {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.input-container textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Send arrow button positioned inside the input box */
+.send-arrow-btn {
+  position: absolute;
+  right: 28px; /* align with input padding */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: #d81b60;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+}
+
+.send-arrow-btn:hover:not(:disabled) {
+  background: #c2185b;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
+}
+
+.send-arrow-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #999;
+  box-shadow: none;
+}
+
+.send-arrow-btn:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.send-arrow-btn svg {
+  width: 18px;
+  height: 18px;
+}
+@media (max-width: 1024px) {
+  /* Override Buy Me A Coffee widget position to top-right on tablets and phones */
+  /* Place the BMC button at top-right and ensure any popup/modal appears
+     directly below it so the message is visually bundled with the button. */
+  #bmc-wbtn {
+    right: 20px !important;
+    top: 20px !important;
+    bottom: auto !important;
+    left: auto !important;
+    z-index: 99999 !important;
+  }
+
+  /* Popup / modal / tooltip elements used by the widget (may vary). Force them
+     to align to the same right edge and sit just below the button so the
+     message appears bundled with the button on mobile devices. */
+  .bmc-popup,
+  .bmc-modal,
+  .bmc-widget,
+  .bmc-overlay,
+  .bmc-tooltip,
+  #bmc-wbtn-modal,
+  .bmc-floating,
+  .bmc-inline {
+    position: fixed !important;
+    right: 20px !important;
+    top: 64px !important; /* place popup directly below the button */
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    max-width: 92vw !important;
+    width: auto !important;
+    z-index: 99998 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+  }
+}
