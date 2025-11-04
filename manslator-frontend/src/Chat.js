@@ -12,7 +12,7 @@ const Chat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
   const messagesEndRef = useRef(null);
-  const API_URL = "http://localhost:8000";
+  const API_URL = "https://manslater.onrender.com";
 
   // Auto-scroll to bottom
   const scrollToBottom = () => {
