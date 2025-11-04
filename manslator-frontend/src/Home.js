@@ -272,7 +272,7 @@ export default function Home() {
           <h1 className="hero-title">manslater</h1>
         </div>
         <button className="glass-button" onClick={handleClick}>
-          Talk to Manslater
+          TALK TO MANSLATER
         </button>
       </div>
     </div>
