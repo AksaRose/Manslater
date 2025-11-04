@@ -50,8 +50,9 @@ const Chat = () => {
       // Handle rate limit (429) or other errors
       if (!response.ok) {
         // Extract error message from response
-        const errorMessage = data.detail?.message || data.detail || "Failed to get response";
-        
+        const errorMessage =
+          data.detail?.message || data.detail || "Failed to get response";
+
         // Add error message as AI response
         setMessages((prev) => [
           ...prev,
@@ -130,17 +131,35 @@ const Chat = () => {
           {messages.map((msg, index) => (
             <div
               key={index}
-              className={`message ${
-                msg.role === "user" ? "user-message" : "ai-message"
+              className={`message-wrapper ${
+                msg.role === "user" ? "user" : "manslater"
               }`}
             >
-              <div className="message-content">{msg.content}</div>
+              {msg.role === "ai" && (
+                <img
+                  src={process.env.PUBLIC_URL + "/images/dfds.png"}
+                  className="avatar"
+                  alt="AI Assistant Profile"
+                />
+              )}
+              <div
+                className={`message-bubble ${
+                  msg.role === "user" ? "user" : "manslater"
+                }`}
+              >
+                {msg.content}
+              </div>
             </div>
           ))}
 
           {isLoading && (
-            <div className="message ai-message">
-              <div className="message-content">
+            <div className="message-wrapper manslater">
+              <img
+                src={process.env.PUBLIC_URL + "/images/dfds.png"}
+                className="avatar"
+                alt="AI Assistant Profile"
+              />
+              <div className="message-bubble manslater loading">
                 <div className="typing-indicator">
                   <span></span>
                   <span></span>
