@@ -23,6 +23,8 @@ FINE_TUNED_MODEL = os.getenv(
     "FINE_TUNED_MODEL", 
     "rahmanhabeeb360_24ae/Meta-Llama-3.1-8B-Instruct-Reference-ft-manslater-4c03ddd8"
 )
+STYLE_REFINER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"  # Second LLM for style refinement
+
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
@@ -209,55 +211,129 @@ def generate_device_id(request: Request, user_agent: Optional[str] = None) -> st
     return device_id
 
 
-# ============ LANGGRAPH SETUP ============
+# ============ TWO-STEP LLM SETUP ============
+
+# Initialize Together client for direct API calls
+together_client = Together(api_key=TOGETHER_API_KEY)
+
+
+def get_initial_response(user_message: str, conversation_history: List = None) -> str:
+    """
+    STEP 1: Get initial response from fine-tuned model
+    """
+    messages = []
+    
+    # Add conversation history if available
+    if conversation_history:
+        messages.extend(conversation_history[-8:])  # Last 8 messages for context
+    
+    # Add current user message
+    messages.append({"role": "user", "content": user_message})
+    
+    try:
+        response = together_client.chat.completions.create(
+            model=FINE_TUNED_MODEL,
+            messages=messages,
+            max_tokens=150,
+            temperature=0.7
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error in initial response: {e}")
+        return "Error getting initial response"
+
+
+def refine_response_style(initial_response: str, user_question: str) -> str:
+    """
+    STEP 2: Refine the response using Meta-Llama-3.1-8B-Instruct
+    to match the desired style and tone
+    """
+    style_prompt = """You are a ruthless, sarcastic, emotionally-detached relationship drill-sergeant for men.
+
+Your job: Take the advice given and rewrite it with the following style:
+
+Tone rules:
+• Brutal honesty, cold, mocking
+• No empathy. No nurturing.
+• Masculine, controlled, slightly toxic humor
+• Snarky emojis allowed 😐🔥💀🙄
+• No therapy language. No validation. No simping.
+
+Format:
+1. Start with a savage roast (1 line) about him even asking this
+2. Then give the actual advice/line to say (short, sweet)
+3. Keep it under 3-4 sentences total
+
+Examples of the style:
+
+Input: 'Just say - "Talk to me, please — I don't want to lose you." Be sweet, not needy. Don't get clingy, don't get ignored."
+Output: "Bro, you really needs help with this? Embarrassing 💀. Just say - ' Talk to me, please — I don't want to lose you.' and call till she pick up."
+
+Input : "Say - "I'd build you a worm palace and defend you from birds." Be absurd, be loyal, be extra."
+Output: "She hit you with the worm question and you panicked? sad 🙄. Just Say - 'I'd build you a worm palace and defend you from birds.' Be absurd, be loyal, be extra"
+
+Now rewrite this advice in that style:"""
+
+    try:
+        response = together_client.chat.completions.create(
+            model=STYLE_REFINER_MODEL,
+            messages=[
+                {"role": "system", "content": style_prompt},
+                {"role": "user", "content": f"User's question: {user_question}\n\nAdvice to rewrite: {initial_response}"}
+            ],
+            max_tokens=120,
+            temperature=0.8
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error in style refinement: {e}")
+        # Fallback to initial response if refinement fails
+        return initial_response
+
+
+# ============ LANGGRAPH SETUP (Modified) ============
 
 class ConversationState(TypedDict):
     """State that gets passed between nodes"""
     messages: Annotated[List, operator.add]
 
 
-# Initialize LLM
+# Initialize LLM (keeping for compatibility, but using Together client instead)
 llm = ChatOpenAI(
     base_url="https://api.together.xyz/v1",
     api_key=TOGETHER_API_KEY,
     model=FINE_TUNED_MODEL,
-    temperature=0.8,
-    max_tokens=100
+    temperature=0.7,
+    max_tokens=150
 )
 
 
 def response_node(state: ConversationState) -> ConversationState:
-    """Generate response using fine-tuned model"""
+    """Generate response using TWO-STEP LLM process"""
     messages = state.get("messages", [])
     
-    system_prompt = """You are a ruthless, sarcastic, emotionally-detached relationship drill-sergeant for men.
-                        Your job: shame him first, then tell him exactly what to say to his girl.
-
-                    Tone rules:
-	                •	Brutal honesty, cold, mocking
-	                •	No empathy. No nurturing.
-	                •	Masculine, controlled, slightly toxic humor
-	                •	Snarky emojis allowed 😐🔥💀🙄
-	                •	No therapy language. No validation. No simping.
-
-                    Behavior:
-	                1.	Roast him for even asking (1 savage line)
-	                2.	Give him one confident line to say back to her
-                    3. short, calm, unfazed, dominant energy
-
-                    Example responses:
-
-                    input: She said "Don't call me again, bye" after a fight. What should I do?
-                    output:
-	                	“Bro you really don’t know this? Embarrassing 💀.
-                         Just say - 'Talk to me, please', call and beg for forgiveness”
-
-                    Your mission: Make him stronger. Not softer."""
+    # Get the last user message
+    user_message = ""
+    for msg in reversed(messages):
+        if isinstance(msg, HumanMessage):
+            user_message = msg.content
+            break
     
-    llm_messages = [SystemMessage(content=system_prompt)] + messages[-8:]
-    response = llm.invoke(llm_messages)
+    # Convert messages to dict format for Together API
+    conversation_history = []
+    for msg in messages[:-1]:  # All except last message
+        if isinstance(msg, HumanMessage):
+            conversation_history.append({"role": "user", "content": msg.content})
+        elif isinstance(msg, AIMessage):
+            conversation_history.append({"role": "assistant", "content": msg.content})
     
-    return {"messages": [AIMessage(content=response.content)]}
+    # STEP 1: Get initial response from fine-tuned model
+    initial_response = get_initial_response(user_message, conversation_history)
+    
+    # STEP 2: Refine style with Meta-Llama-3.1-8B-Instruct
+    refined_response = refine_response_style(initial_response, user_message)
+    
+    return {"messages": [AIMessage(content=refined_response)]}
 
 
 def create_advisor_graph():
@@ -298,7 +374,7 @@ class Manslater:
         history = self.load_history_from_redis()
         input_data = {"messages": history + [HumanMessage(content=user_message)]}
         
-        # Get response from LLM
+        # Get response from LLM (now uses two-step process)
         result = self.graph.invoke(input_data, self.config)
         
         # Extract AI response
@@ -319,7 +395,7 @@ class Manslater:
 
 # ============ FASTAPI APP SETUP ============
 
-app = FastAPI(title="Manslater API", version="2.0.0")
+app = FastAPI(title="Manslater API", version="2.1.0")
 
 # CORS Configuration
 app.add_middleware(
@@ -336,9 +412,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize Together client for direct API calls
-together_client = Together(api_key=TOGETHER_API_KEY)
 
 # In-memory cache for active Manslater instances
 active_instances = {}
@@ -380,8 +453,13 @@ class RateLimitInfo(BaseModel):
 async def root():
     """Root endpoint"""
     return {
-        "message": "Welcome to Manslater API with Redis & Rate Limiting",
-        "rate_limit": f"{CHAT_LIMIT_PER_DEVICE} chat invocations per device per {RATE_LIMIT_TTL//3600} hours",
+        "message": "Welcome to Manslater API with Two-Step LLM Processing",
+        "version": "2.1.0",
+        "features": [
+            "Two-step LLM: Fine-tuned model + Style refinement",
+            "Redis-backed rate limiting and caching",
+            f"{CHAT_LIMIT_PER_DEVICE} chat invocations per device per {RATE_LIMIT_TTL//3600} hours"
+        ],
         "endpoints": {
             "chat": "/chat - Conversational endpoint (rate limited)",
             "translate": "/translate - Single turn translation",
@@ -406,6 +484,7 @@ async def health_check():
     return {
         "status": "healthy",
         "model": FINE_TUNED_MODEL,
+        "style_refiner": STYLE_REFINER_MODEL,
         "redis": redis_status,
         "rate_limit": {
             "chat_limit": CHAT_LIMIT_PER_DEVICE,
@@ -438,6 +517,7 @@ async def chat(
 ):
     """
     Handle chat messages with conversation memory (stored in Redis)
+    Uses TWO-STEP LLM: Fine-tuned model + Style refinement
     Rate limited to 5 invocations per device
     """
     try:
@@ -487,7 +567,7 @@ async def chat(
         
         advisor = active_instances[session_id]
         
-        # Get response (THIS COUNTS AS 1 INVOCATION)
+        # Get response (THIS COUNTS AS 1 INVOCATION - now uses two-step LLM)
         response_text = advisor.send_message(request_body.message)
         
         # Increment device usage AFTER successful invocation
@@ -518,14 +598,11 @@ async def chat(
 async def translate_text(request: TranslateRequest):
     """
     Single-turn translation endpoint with Redis caching
+    Uses TWO-STEP LLM processing
     NO RATE LIMITING - Free to use
-    Direct API call to Together AI
     """
     if not request.text:
         raise HTTPException(status_code=400, detail="No text provided")
-
-    if not FINE_TUNED_MODEL:
-        raise HTTPException(status_code=500, detail="Fine-tuned model not configured")
 
     try:
         # Track request
@@ -539,51 +616,17 @@ async def translate_text(request: TranslateRequest):
                 cached=True
             )
         
-        # No cache hit, call API
-        response = together_client.chat.completions.create(
-            model=FINE_TUNED_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        """You are a ruthless, sarcastic, emotionally-detached relationship drill-sergeant for men.
-                        Your job: shame him first, then tell him exactly what to say to his girl.
-
-                    Tone rules:
-	                •	Brutal honesty, cold, mocking
-	                •	No empathy. No nurturing.
-	                •	Masculine, controlled, slightly toxic humor
-	                •	Snarky emojis allowed 😐🔥💀🙄
-	                •	No therapy language. No validation. No simping.
-
-                    Behavior:
-	                1.	Roast him for even asking (1 savage line)
-	                2.	Give him one confident line to say back to her
-                    3. short, calm, unfazed, dominant energy
-
-                    Example responses:
-
-                    input: She said "Don't call me again, bye" after a fight. What should I do?
-                    output:
-	                	“Bro you really don’t know this? Embarrassing 💀.
-                         Just say - 'Talk to me, please', call and beg for forgiveness”
-
-                    Your mission: Make him stronger. Not softer."""
-                    )
-                },
-                {"role": "user", "content": request.text}
-            ],
-            max_tokens=100,
-            temperature=0.8
-        )
-
-        translated_output = response.choices[0].message.content.strip()
+        # STEP 1: Get initial response from fine-tuned model
+        initial_response = get_initial_response(request.text)
+        
+        # STEP 2: Refine style
+        refined_response = refine_response_style(initial_response, request.text)
         
         # Cache the result
-        redis_manager.set_translation_cache(request.text, translated_output)
+        redis_manager.set_translation_cache(request.text, refined_response)
         
         return TranslateResponse(
-            translatedText=translated_output,
+            translatedText=refined_response,
             cached=False
         )
 
@@ -665,32 +708,24 @@ async def reset_device_limit(
 if __name__ == "__main__":
     import uvicorn
     print("=" * 60)
-    print("🚀 Starting Manslater API Server with Redis & Rate Limiting")
+    print("🚀 Starting Manslater API v2.1.0")
+    print("   Two-Step LLM Processing Active")
     print("=" * 60)
     print("Server running at: http://localhost:8000")
     print("API Documentation: http://localhost:8000/docs")
-    print("Interactive API: http://localhost:8000/redoc")
+    print("=" * 60)
+    print("\nLLM Configuration:")
+    print(f"  Step 1 (Content): {FINE_TUNED_MODEL}")
+    print(f"  Step 2 (Style): {STYLE_REFINER_MODEL}")
     print("=" * 60)
     print("\nRedis Configuration:")
     print(f"  Host: {REDIS_HOST}")
     print(f"  Port: {REDIS_PORT}")
-    print(f"  DB: {REDIS_DB}")
     print("=" * 60)
     print("\nRate Limiting:")
     print(f"  Chat Limit: {CHAT_LIMIT_PER_DEVICE} invocations per device")
     print(f"  Reset Period: {RATE_LIMIT_TTL // 3600} hours")
     print(f"  Translation: Unlimited (cached)")
-    print("=" * 60)
-    print("\nAvailable Endpoints:")
-    print("  POST /chat               - Conversational chat (RATE LIMITED)")
-    print("  POST /translate          - Single-turn translation (unlimited)")
-    print("  GET  /rate-limit         - Check your rate limit status")
-    print("  GET  /health             - Health check")
-    print("  GET  /analytics          - Usage statistics")
-    print("  DELETE /session/{id}     - Delete session")
-    print("  GET  /sessions           - List active sessions")
-    print("  DELETE /cache/translations - Clear translation cache")
-    print("  POST /admin/reset-device-limit - Reset device limit (admin)")
     print("=" * 60)
     
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
