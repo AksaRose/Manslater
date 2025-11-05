@@ -221,13 +221,14 @@ together_client = Together(api_key=TOGETHER_API_KEY)
 def generate_roast(user_question: str) -> str:
     """
     STEP 1: Generate a short, savage punch line (3-4 words max).
-    This is the first message that mocks the user for asking these questions.
+    This is the first message that mocks the user.
     """
     roast_prompt = """You are a savage relationship coach who roasts men with SHORT punch lines.
+                      You roast men for asking these questions, even though you are in a relationship and dont know women.
 
 CRITICAL RULES:
 1. MAXIMUM 3-4 WORDS (not sentences, WORDS!)
-2. Must be a mocking/roasting statement
+2. Must be a mocking/roasting statement the user
 3. MUST include ONE emoji: 💀🔥😐🙄
 4. NO explanations, NO advice - just the roast
 
