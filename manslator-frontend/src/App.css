@@ -56,9 +56,10 @@ h1 {
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  height: 70vh;
+  height: 65vh;
+  margin-top: 80px; /* Add space below branding */
   overflow: hidden;
-  justify-content: flex-start; /* Start content from top */
+  justify-content: flex-start;
   position: relative;
 }
 
@@ -215,6 +216,7 @@ h1 {
   .chat-container {
     padding: 10px;
     height: 55vh;
+    margin-top: 20px; /* Reduce space in mobile view */
   }
 
   .message-bubble {
