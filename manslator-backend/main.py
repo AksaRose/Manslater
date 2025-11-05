@@ -14,6 +14,7 @@ from together import Together
 import redis
 from datetime import timedelta
 import hashlib
+import random
 
 # ============ ENVIRONMENT SETUP ============
 load_dotenv()
@@ -219,8 +220,8 @@ together_client = Together(api_key=TOGETHER_API_KEY)
 
 def generate_roast(user_question: str) -> str:
     """
-    STEP 1: Generate a short, savage punch line (3-4 words max) using Meta-Llama
-    This is the first message that mocks the user
+    STEP 1: Generate a short, savage punch line (3-4 words max).
+    This is the first message that mocks the user for asking these questions.
     """
     roast_prompt = """You are a savage relationship coach who roasts men with SHORT punch lines.
 
@@ -308,6 +309,9 @@ def generate_advice(user_question: str, conversation_history: List = None) -> st
         )
         advice = response.choices[0].message.content.strip()
         
+        if random.random() < 0.8:
+            advice = advice.replace("\n", " ")
+
         # Format as: "just say - 'the advice'"
         if not advice.lower().startswith("just say"):
             advice = f"{advice}"
