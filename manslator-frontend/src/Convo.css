@@ -954,7 +954,7 @@
 
   /* slightly increase messages area to match new convo container height */
   .messages-container {
-    height: calc(100vh - 200px) !important;
+    height: calc(100vh - 210px) !important;
   }
 }
 
@@ -964,7 +964,7 @@
     /* push a bit further down so brand stays visible and input isn't covered */
     margin-top: 60px;
     /* reduce available chat height so input area remains on-screen */
-    max-height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 210px) !important;
   }
 
   .messages-container {
