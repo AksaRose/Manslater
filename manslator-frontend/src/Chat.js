@@ -53,13 +53,16 @@ const Chat = () => {
         const errorMessage =
           data.detail?.message || data.detail || "Failed to get response";
 
-        // Add error message as AI response
+        // Split error message by newline if it contains multiple parts
+        const errorParts = errorMessage.split('\n').filter(part => part.trim());
+        
+        // Add each error part as a separate AI message
         setMessages((prev) => [
           ...prev,
-          {
+          ...errorParts.map(part => ({
             role: "ai",
-            content: errorMessage,
-          },
+            content: part
+          }))
         ]);
         return;
       }
@@ -69,14 +72,18 @@ const Chat = () => {
         setSessionId(data.session_id);
       }
 
-      // Add AI response to chat
+      // Split the response by newline to separate roast and advice
+      const responseParts = data.response.split('\n').filter(part => part.trim());
+
+      // Add each part as a separate AI message bubble
       setMessages((prev) => [
         ...prev,
-        {
+        ...responseParts.map(part => ({
           role: "ai",
-          content: data.response,
-        },
+          content: part
+        }))
       ]);
+
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => [
