@@ -23,7 +23,7 @@ FINE_TUNED_MODEL = os.getenv(
     "FINE_TUNED_MODEL", 
     "rahmanhabeeb360_24ae/Meta-Llama-3.1-8B-Instruct-Reference-ft-manslater-4c03ddd8"
 )
-STYLE_REFINER_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"  # Second LLM for style refinement
+ROAST_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo"  # For generating roasts
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
@@ -217,18 +217,87 @@ def generate_device_id(request: Request, user_agent: Optional[str] = None) -> st
 together_client = Together(api_key=TOGETHER_API_KEY)
 
 
-def get_initial_response(user_message: str, conversation_history: List = None) -> str:
+def generate_roast(user_question: str) -> str:
     """
-    STEP 1: Get initial response from fine-tuned model
+    STEP 1: Generate a short, savage punch line (3-4 words max) using Meta-Llama
+    This is the first message that mocks the user
+    """
+    roast_prompt = """You are a savage relationship coach who roasts men with SHORT punch lines.
+
+CRITICAL RULES:
+1. MAXIMUM 3-4 WORDS (not sentences, WORDS!)
+2. Must be a mocking/roasting statement
+3. MUST include ONE emoji: 💀🔥😐🙄
+4. NO explanations, NO advice - just the roast
+
+EXAMPLES:
+
+Input: "she said 'we need to talk'"
+Output: "You screwed, moron 😐"
+
+Input: "She said she's fine"
+Output: "Are you dumb? 💀"
+
+Input: "She's ignoring me"
+Output: "Weak move, bro 🙄"
+
+Input: "Should I text her?"
+Output: "Really asking this? 💀"
+
+Input: "She left me on read"
+Output: "That's embarrassing 😐"
+
+Input: "I think she's mad"
+Output: "You think? you dont know?💀"
+
+NOW - Generate ONLY the short roast (3-4 words + emoji) for this question:
+{user_question}
+
+YOUR ROAST:"""
+
+    try:
+        response = together_client.chat.completions.create(
+            model=ROAST_MODEL,
+            messages=[
+                {"role": "system", "content": "You generate ultra-short savage roasts. Max 4 words + 1 emoji. No explanations."},
+                {"role": "user", "content": roast_prompt.format(user_question=user_question)}
+            ],
+            max_tokens=15,
+            temperature=0.9,
+            top_p=0.95
+        )
+        
+        roast = response.choices[0].message.content.strip()
+        
+        # Clean up if it's too long (safety check)
+        words = roast.split()
+        if len(words) > 5:
+            roast = ' '.join(words[:4])
+        
+        # Ensure it has an emoji, add one if missing
+        if not any(emoji in roast for emoji in ['💀', '🔥', '😐', '🙄']):
+            roast += " 💀"
+            
+        return roast
+        
+    except Exception as e:
+        print(f"Error generating roast: {e}")
+        return e
+
+
+def generate_advice(user_question: str, conversation_history: List = None) -> str:
+    """
+    STEP 2: Generate the actual advice using your fine-tuned model
+    This is the second message with the response
     """
     messages = []
     
     # Add conversation history if available
     if conversation_history:
-        messages.extend(conversation_history[-8:])  # Last 8 messages for context
+        messages.extend(conversation_history[-8:])
     
     # Add current user message
-    messages.append({"role": "user", "content": user_message})
+    messages.append({"role": "user", "content": user_question})
     
     try:
         response = together_client.chat.completions.create(
@@ -237,58 +306,17 @@ def get_initial_response(user_message: str, conversation_history: List = None) -
             max_tokens=150,
             temperature=0.7
         )
-        return response.choices[0].message.content.strip()
+        advice = response.choices[0].message.content.strip()
+        
+        # Format as: "just say - 'the advice'"
+        if not advice.lower().startswith("just say"):
+            advice = f"{advice}"
+        
+        return advice
+        
     except Exception as e:
-        print(f"Error in initial response: {e}")
-        return "Error getting initial response"
-
-
-def refine_response_style(initial_response: str, user_question: str) -> str:
-    """
-    STEP 2: Refine the response using Meta-Llama-3.1-8B-Instruct
-    to match the desired style and tone
-    """
-    style_prompt = """You are a ruthless, sarcastic, emotionally-detached relationship drill-sergeant for men.
-
-Your job: Take the advice given and rewrite it with the following style:
-
-Tone rules:
-• Brutal honesty, cold, mocking
-• No empathy. No nurturing.
-• Masculine, controlled, slightly toxic humor
-• Snarky emojis allowed 😐🔥💀🙄
-• No therapy language. No validation. No simping.
-
-Format:
-1. Start with a savage roast (1 line) about him even asking this
-2. Then give the actual advice/line to say (short, sweet)
-3. Keep it under 3-4 sentences total
-
-Examples of the style:
-
-Input: 'Just say - "Talk to me, please — I don't want to lose you." Be sweet, not needy. Don't get clingy, don't get ignored."
-Output: "Bro, you really needs help with this? Embarrassing 💀. Just say - ' Talk to me, please — I don't want to lose you.' and call till she pick up."
-
-Input : "Say - "I'd build you a worm palace and defend you from birds." Be absurd, be loyal, be extra."
-Output: "She hit you with the worm question and you panicked? sad 🙄. Just Say - 'I'd build you a worm palace and defend you from birds.' Be absurd, be loyal, be extra"
-
-Now rewrite this advice in that style:"""
-
-    try:
-        response = together_client.chat.completions.create(
-            model=STYLE_REFINER_MODEL,
-            messages=[
-                {"role": "system", "content": style_prompt},
-                {"role": "user", "content": f"User's question: {user_question}\n\nAdvice to rewrite: {initial_response}"}
-            ],
-            max_tokens=120,
-            temperature=0.8
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"Error in style refinement: {e}")
-        # Fallback to initial response if refinement fails
-        return initial_response
+        print(f"Error generating advice: {e}")
+        return "just say - \"Talk to me when you're ready.\""
 
 
 # ============ LANGGRAPH SETUP (Modified) ============
@@ -298,7 +326,7 @@ class ConversationState(TypedDict):
     messages: Annotated[List, operator.add]
 
 
-# Initialize LLM (keeping for compatibility, but using Together client instead)
+# Initialize LLM (keeping for compatibility)
 llm = ChatOpenAI(
     base_url="https://api.together.xyz/v1",
     api_key=TOGETHER_API_KEY,
@@ -309,7 +337,7 @@ llm = ChatOpenAI(
 
 
 def response_node(state: ConversationState) -> ConversationState:
-    """Generate response using TWO-STEP LLM process"""
+    """Generate TWO separate messages: roast + advice"""
     messages = state.get("messages", [])
     
     # Get the last user message
@@ -327,13 +355,16 @@ def response_node(state: ConversationState) -> ConversationState:
         elif isinstance(msg, AIMessage):
             conversation_history.append({"role": "assistant", "content": msg.content})
     
-    # STEP 1: Get initial response from fine-tuned model
-    initial_response = get_initial_response(user_message, conversation_history)
+    # STEP 1: Generate roast (short punch line)
+    roast = generate_roast(user_message)
     
-    # STEP 2: Refine style with Meta-Llama-3.1-8B-Instruct
-    refined_response = refine_response_style(initial_response, user_message)
+    # STEP 2: Generate advice (actual response)
+    advice = generate_advice(user_message, conversation_history)
     
-    return {"messages": [AIMessage(content=refined_response)]}
+    # Combine both messages with newline separator
+    combined_response = f"{roast}\n{advice}"
+    
+    return {"messages": [AIMessage(content=combined_response)]}
 
 
 def create_advisor_graph():
@@ -374,7 +405,7 @@ class Manslater:
         history = self.load_history_from_redis()
         input_data = {"messages": history + [HumanMessage(content=user_message)]}
         
-        # Get response from LLM (now uses two-step process)
+        # Get response from LLM (two separate messages combined)
         result = self.graph.invoke(input_data, self.config)
         
         # Extract AI response
@@ -385,7 +416,7 @@ class Manslater:
                 break
         
         if not ai_response:
-            ai_response = "Something went wrong, bro."
+            ai_response = "Something wrong? 💀\njust say - \"Talk to me.\""
         
         # Save AI response to Redis
         redis_manager.save_chat_message(self.session_id, "assistant", ai_response)
@@ -395,7 +426,7 @@ class Manslater:
 
 # ============ FASTAPI APP SETUP ============
 
-app = FastAPI(title="Manslater API", version="2.1.0")
+app = FastAPI(title="Manslater API", version="2.2.0")
 
 # CORS Configuration
 app.add_middleware(
@@ -453,13 +484,14 @@ class RateLimitInfo(BaseModel):
 async def root():
     """Root endpoint"""
     return {
-        "message": "Welcome to Manslater API with Two-Step LLM Processing",
-        "version": "2.1.0",
+        "message": "Welcome to Manslater API v2.2.0",
+        "version": "2.2.0",
         "features": [
-            "Two-step LLM: Fine-tuned model + Style refinement",
+            "Two-message format: Roast (3-4 words) + Advice",
             "Redis-backed rate limiting and caching",
             f"{CHAT_LIMIT_PER_DEVICE} chat invocations per device per {RATE_LIMIT_TTL//3600} hours"
         ],
+        "response_format": "Line 1: Short roast (3-4 words + emoji)\nLine 2: Advice (just say - 'text')",
         "endpoints": {
             "chat": "/chat - Conversational endpoint (rate limited)",
             "translate": "/translate - Single turn translation",
@@ -483,8 +515,8 @@ async def health_check():
     
     return {
         "status": "healthy",
-        "model": FINE_TUNED_MODEL,
-        "style_refiner": STYLE_REFINER_MODEL,
+        "fine_tuned_model": FINE_TUNED_MODEL,
+        "roast_model": ROAST_MODEL,
         "redis": redis_status,
         "rate_limit": {
             "chat_limit": CHAT_LIMIT_PER_DEVICE,
@@ -517,7 +549,9 @@ async def chat(
 ):
     """
     Handle chat messages with conversation memory (stored in Redis)
-    Uses TWO-STEP LLM: Fine-tuned model + Style refinement
+    Returns TWO separate messages:
+    1. Short roast (3-4 words + emoji)
+    2. Actual advice (just say - "text")
     Rate limited to 5 invocations per device
     """
     try:
@@ -532,7 +566,7 @@ async def chat(
             hours_remaining = ttl // 3600
             minutes_remaining = (ttl % 3600) // 60
             
-            rate_limit_message = f"You have used all {CHAT_LIMIT_PER_DEVICE} chat invocations. Please try again in {hours_remaining}h {minutes_remaining}m."
+            rate_limit_message = f"Rate limit hit 😐\nYou have used all {CHAT_LIMIT_PER_DEVICE} chats. Try again in {hours_remaining}h {minutes_remaining}m."
             
             # Get or create session to save the rate limit message
             session_id = request_body.session_id or f"session_{os.urandom(8).hex()}"
@@ -567,7 +601,7 @@ async def chat(
         
         advisor = active_instances[session_id]
         
-        # Get response (THIS COUNTS AS 1 INVOCATION - now uses two-step LLM)
+        # Get response (TWO messages combined with newline)
         response_text = advisor.send_message(request_body.message)
         
         # Increment device usage AFTER successful invocation
@@ -598,7 +632,7 @@ async def chat(
 async def translate_text(request: TranslateRequest):
     """
     Single-turn translation endpoint with Redis caching
-    Uses TWO-STEP LLM processing
+    Returns TWO messages: roast + advice
     NO RATE LIMITING - Free to use
     """
     if not request.text:
@@ -616,17 +650,20 @@ async def translate_text(request: TranslateRequest):
                 cached=True
             )
         
-        # STEP 1: Get initial response from fine-tuned model
-        initial_response = get_initial_response(request.text)
+        # Generate roast
+        roast = generate_roast(request.text)
         
-        # STEP 2: Refine style
-        refined_response = refine_response_style(initial_response, request.text)
+        # Generate advice
+        advice = generate_advice(request.text)
+        
+        # Combine both messages
+        combined = f"{roast}\n{advice}"
         
         # Cache the result
-        redis_manager.set_translation_cache(request.text, refined_response)
+        redis_manager.set_translation_cache(request.text, combined)
         
         return TranslateResponse(
-            translatedText=refined_response,
+            translatedText=combined,
             cached=False
         )
 
@@ -708,15 +745,19 @@ async def reset_device_limit(
 if __name__ == "__main__":
     import uvicorn
     print("=" * 60)
-    print("🚀 Starting Manslater API v2.1.0")
-    print("   Two-Step LLM Processing Active")
+    print("🚀 Starting Manslater API v2.2.0")
+    print("   Two-Message Format Active")
     print("=" * 60)
     print("Server running at: http://localhost:8000")
     print("API Documentation: http://localhost:8000/docs")
     print("=" * 60)
+    print("\nResponse Format:")
+    print("  Message 1: Short roast (3-4 words + emoji)")
+    print("  Message 2: Advice (just say - 'text')")
+    print("=" * 60)
     print("\nLLM Configuration:")
-    print(f"  Step 1 (Content): {FINE_TUNED_MODEL}")
-    print(f"  Step 2 (Style): {STYLE_REFINER_MODEL}")
+    print(f"  Roast Generator: {ROAST_MODEL}")
+    print(f"  Advice Generator: {FINE_TUNED_MODEL}")
     print("=" * 60)
     print("\nRedis Configuration:")
     print(f"  Host: {REDIS_HOST}")
@@ -725,7 +766,6 @@ if __name__ == "__main__":
     print("\nRate Limiting:")
     print(f"  Chat Limit: {CHAT_LIMIT_PER_DEVICE} invocations per device")
     print(f"  Reset Period: {RATE_LIMIT_TTL // 3600} hours")
-    print(f"  Translation: Unlimited (cached)")
     print("=" * 60)
     
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
