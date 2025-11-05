@@ -942,3 +942,38 @@
     transform: scale(0.8) !important;
   }
 }
+
+/* Taller mobile screens: give the convo more vertical space on tall phones */
+@media screen and (max-width: 480px) and (min-height: 780px) {
+  .convo-container {
+    /* reduce top margin a little to use more vertical space */
+    margin-top: 60px;
+    /* give more height so chat feels less cramped on tall displays */
+    max-height: calc(100vh - 180px) !important;
+  }
+
+  /* slightly increase messages area to match new convo container height */
+  .messages-container {
+    height: calc(100vh - 200px) !important;
+  }
+}
+
+/* Shorter mobile screens: keep input visible by reducing convo height */
+@media screen and (max-width: 480px) and (max-height: 780px) {
+  .convo-container {
+    /* push a bit further down so brand stays visible and input isn't covered */
+    margin-top: 60px;
+    /* reduce available chat height so input area remains on-screen */
+    max-height: calc(100vh - 170px) !important;
+  }
+
+  .messages-container {
+    /* shrink messages area correspondingly */
+    height: calc(100vh - 260px) !important;
+  }
+
+  /* nudge input container up slightly to avoid overlap on very short screens */
+  .input-container-fixed {
+    bottom: 12px !important;
+  }
+}
