@@ -17,7 +17,7 @@ const Chat = () => {
   const typingPhrases = [
     "Wait, genius — I'm thinking 🤔",
     "It's women, you know it's hard",
-    "Almost there"
+    "Almost there",
   ];
   const [typingIndex, setTypingIndex] = useState(0);
   const [dotCount, setDotCount] = useState(0);
@@ -165,9 +165,23 @@ const Chat = () => {
     <>
       <div className="convo-container">
         <div className="convo-header">
-          <button className="clear-btn" onClick={clearChat} aria-label="Clear chat">
+          <button
+            className="clear-btn"
+            onClick={clearChat}
+            aria-label="Clear chat"
+          >
             {/* Trash / bin icon */}
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <polyline points="3 6 5 6 21 6" />
               <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
               <path d="M10 11v6" />
