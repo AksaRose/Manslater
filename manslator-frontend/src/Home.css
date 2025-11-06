@@ -3,6 +3,25 @@
   position: relative;
 }
 
+/* Seamless page transition - opacity-only fade
+   IMPORTANT: do NOT animate `transform` on an ancestor that contains
+   position:fixed children (SVGs, overlays). Transforming an ancestor
+   creates a new containing block and will make fixed elements jump.
+   We only animate opacity here for a smooth, non-layout-changing fade.
+*/
+body.page-transition-out .home-root {
+  opacity: 0;
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
+  pointer-events: none;
+}
+
+/* Ensure the base home-root defines the same opacity transition so the
+   change is smooth whether adding or removing the class. */
+.home-root {
+  transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .home-hero-svg {
   position: fixed;
   top: 0;

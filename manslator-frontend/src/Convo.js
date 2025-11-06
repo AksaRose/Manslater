@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Chat from "./Chat";
 import "./Convo.css";
 
 export default function Convo() {
+  useEffect(() => {
+    // remove transition class if it was left on the body
+    if (
+      document &&
+      document.body &&
+      document.body.classList.contains("page-transition-out")
+    ) {
+      document.body.classList.remove("page-transition-out");
+    }
+    // ensure any page-enter class is removed after mount
+    if (
+      document &&
+      document.body &&
+      document.body.classList.contains("page-enter")
+    ) {
+      document.body.classList.remove("page-enter");
+    }
+  }, []);
   return (
     <div className="home-root">
       <div className="hero-svg" aria-hidden="true">

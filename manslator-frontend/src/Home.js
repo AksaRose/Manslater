@@ -6,7 +6,16 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/Convo");
+    // play a small page-out transition then navigate
+    if (document && document.body) {
+      document.body.classList.add("page-transition-out");
+    }
+
+    // wait for the animation to run, then navigate
+    // match this to the CSS transition (320ms) and give a small buffer
+    setTimeout(() => {
+      navigate("/convo");
+    }, 360);
   };
 
   return (
