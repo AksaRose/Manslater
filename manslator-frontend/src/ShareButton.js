@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from "react";
-import html2canvas from "html2canvas";
 import "./ShareButton.css";
 
 const ShareButton = ({ onCapture, visible }) => {
