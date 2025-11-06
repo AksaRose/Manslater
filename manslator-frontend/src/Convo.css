@@ -575,8 +575,8 @@
   left: 50%; /* center horizontally */
   transform: translateX(-50%); /* center offset */
   z-index: 10; /* above chat container and hero */
-  width: min(680px, 86vw);
-  max-width: 680px;
+  width: min(800px, 92vw); /* match convo-container width exactly */
+  max-width: 800px; /* match convo-container max-width */
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
@@ -838,6 +838,10 @@
     width: 90vw;
     margin-top: 60px;
   }
+  /* Match input container width to convo container */
+  .input-container-fixed {
+    width: 90vw;
+  }
 
   /* Buy me a coffee button adjustments */
   #bmc-wbtn {
@@ -906,6 +910,10 @@
     margin-top: 90px;
     margin-bottom: 80px;
     background: rgba(255, 255, 255, 0.25);
+  }
+  /* Match input container width to convo container */
+  .input-container-fixed {
+    width: 92vw;
   }
 
   /* Buy me a coffee button mobile positioning */
