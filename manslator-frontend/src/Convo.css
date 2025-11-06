@@ -92,6 +92,14 @@
     max-height: calc(100vh - 140px); /* More vertical space on mobile */
     margin-top: 80px; /* Reduce top margin on mobile */
   }
+  /* When mobile keyboard is open, prevent body scrolling and page "bounce" */
+  body.keyboard-open {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100vh;
+    touch-action: none; /* reduce accidental overscroll gestures */
+  }
 }
 /* Third decorative SVG */
 .hero-svg-3 {

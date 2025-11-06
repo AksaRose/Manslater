@@ -163,6 +163,9 @@ const Chat = () => {
 
     const userMessage = input.trim();
     setInput("");
+    // ensure body class removed when message is sent programmatically
+    if (document && document.body)
+      document.body.classList.remove("keyboard-open");
 
     // Add user message to chat
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
@@ -371,6 +374,8 @@ const Chat = () => {
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onFocus={() => document.body.classList.add("keyboard-open")}
+          onBlur={() => document.body.classList.remove("keyboard-open")}
           onInput={adjustTextareaHeight}
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
