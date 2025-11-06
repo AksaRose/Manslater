@@ -1,0 +1,141 @@
+/* Share button styles */
+.share-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #d81b60;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 8px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+  position: absolute;
+  right: -40px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.8);
+}
+
+.share-button.visible {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+.share-button:hover {
+  background: #c2185b;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
+}
+
+.share-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.share-button svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  transition: transform 0.2s ease;
+}
+
+.share-button:hover svg {
+  transform: translateY(-1px);
+}
+
+/* Screenshot overlay styles */
+.screenshot-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.screenshot-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.screenshot-content {
+  background: #1a1a1a;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+  width: calc(100vw - 48px);
+  height: calc(100vh - 48px);
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  overflow: hidden;
+}
+
+.screenshot-image-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -24px;
+  margin-bottom: 0;
+  background: #000;
+}
+
+.screenshot-preview-image {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 140px);
+  object-fit: contain;
+}
+
+.screenshot-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 20px 24px 0;
+  background: #1a1a1a;
+}
+
+.screenshot-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.screenshot-primary {
+  background: #d81b60;
+  color: white;
+}
+
+.screenshot-secondary {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.screenshot-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

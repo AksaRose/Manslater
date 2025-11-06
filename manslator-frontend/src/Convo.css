@@ -85,6 +85,14 @@
   position: fixed;
   overflow: hidden;
 }
+
+@media screen and (max-width: 768px) {
+  .convo-container {
+    width: calc(100vw - 16px); /* Reduce side margins on mobile */
+    max-height: calc(100vh - 140px); /* More vertical space on mobile */
+    margin-top: 80px; /* Reduce top margin on mobile */
+  }
+}
 /* Third decorative SVG */
 .hero-svg-3 {
   position: fixed;
@@ -514,8 +522,15 @@
   justify-content: flex-start;
 }
 
-.message-content {
+.message-content-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
   max-width: 70%;
+}
+
+.message-bubble {
+  max-width: 100%;
   padding: 12px 18px;
   border-radius: 18px;
   line-height: 1.5;

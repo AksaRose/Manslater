@@ -1,5 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import html2canvas from "html2canvas";
 import "./Convo.css";
+import ShareButton from "./ShareButton";
+import "./ShareButton.css";
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -11,7 +14,10 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [showScreenshot, setShowScreenshot] = useState(false);
+  const [screenshotImage, setScreenshotImage] = useState(null);
   const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
   const API_URL = "https://manslater.onrender.com";
   // Typing indicator phrases and animation state
   const typingPhrases = [
@@ -161,9 +167,118 @@ const Chat = () => {
     setSessionId(null);
   };
 
+  const captureConversation = useCallback(async () => {
+    if (!containerRef.current) return;
+
+    try {
+      // First, capture the conversation
+      const conversationCanvas = await html2canvas(containerRef.current, {
+        backgroundColor: "transparent",
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        onclone: (clonedDoc) => {
+          const container = clonedDoc.querySelector(".convo-container");
+          if (container) {
+            // Reset all positioning to ensure clean capture
+            container.style.position = "relative";
+            container.style.maxHeight = "none";
+            container.style.height = "auto";
+            container.style.margin = "0";
+            container.style.background = "transparent";
+            container.style.transform = "none";
+            container.style.left = "0";
+            container.style.top = "0";
+            // Ensure messages are centered
+            container.style.width = "100%";
+            container.style.maxWidth = "800px"; // Match your design width
+            // Add padding for better visual balance
+            container.style.padding = "20px";
+          }
+        },
+      });
+
+      // Create a new canvas for the final composition
+      const finalCanvas = document.createElement("canvas");
+      const ctx = finalCanvas.getContext("2d");
+
+      // Load the template image
+      const templateImage = new Image();
+      templateImage.crossOrigin = "anonymous";
+      templateImage.src = `${process.env.PUBLIC_URL}/images/template.jpg`;
+
+      await new Promise((resolve, reject) => {
+        templateImage.onload = () => {
+          // Set canvas size to match template
+          finalCanvas.width = templateImage.width;
+          finalCanvas.height = templateImage.height;
+
+          // Draw template first
+          ctx.drawImage(templateImage, 0, 0);
+
+          // Calculate optimal positioning for conversation
+          // Adjust padding based on screen size
+          const isMobile = window.innerWidth <= 768;
+          const verticalPadding =
+            templateImage.height * (isMobile ? 0.15 : 0.25); // Reduce padding on mobile
+          const horizontalPadding =
+            templateImage.width * (isMobile ? 0.05 : 0.1); // Reduce padding on mobile
+
+          // Calculate available space
+          const availableWidth = templateImage.width - horizontalPadding * 2;
+          const availableHeight = templateImage.height - verticalPadding * 2;
+
+          // Calculate scale while maintaining aspect ratio
+          const scale =
+            Math.min(
+              availableWidth / conversationCanvas.width,
+              availableHeight / conversationCanvas.height
+            ) * (isMobile ? 1.1 : 0.95); // Increase size on mobile
+
+          const scaledWidth = conversationCanvas.width * scale;
+          const scaledHeight = conversationCanvas.height * scale;
+
+          // Center precisely in template
+          const x = (templateImage.width - scaledWidth) / 2;
+          // Adjust vertical position based on device
+          const verticalPosition = isMobile ? 0.47 : 0.4; // Position at 45% from top on mobile
+          const y = templateImage.height * verticalPosition - scaledHeight / 2;
+
+          // Draw conversation on top
+          ctx.drawImage(conversationCanvas, x, y, scaledWidth, scaledHeight);
+
+          resolve();
+        };
+        templateImage.onerror = reject;
+      });
+
+      const image = finalCanvas.toDataURL("image/png");
+      setScreenshotImage(image);
+      setShowScreenshot(true);
+    } catch (error) {
+      console.error("Error capturing conversation:", error);
+    }
+  }, []);
+
+  const downloadImage = useCallback(() => {
+    if (!screenshotImage) return;
+
+    const link = document.createElement("a");
+    link.href = screenshotImage;
+    link.download = "manslater-conversation.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [screenshotImage]);
+
+  const closeScreenshot = () => {
+    setShowScreenshot(false);
+    setScreenshotImage(null);
+  };
+
   return (
     <>
-      <div className="convo-container">
+      <div className="convo-container" ref={containerRef}>
         <div className="convo-header">
           <button
             className="clear-btn"
@@ -206,12 +321,20 @@ const Chat = () => {
                   alt="AI Assistant Profile"
                 />
               )}
-              <div
-                className={`message-bubble ${
-                  msg.role === "user" ? "user" : "manslater"
-                }`}
-              >
-                {msg.content}
+              <div className="message-content-wrapper">
+                <div
+                  className={`message-bubble ${
+                    msg.role === "user" ? "user" : "manslater"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+                {msg.role === "ai" && (
+                  <ShareButton
+                    onCapture={captureConversation}
+                    visible={index === messages.length - 1 && !isLoading}
+                  />
+                )}
               </div>
             </div>
           ))}
@@ -240,6 +363,40 @@ const Chat = () => {
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {/* Screenshot preview overlay */}
+      {showScreenshot && (
+        <div className="screenshot-overlay visible" onClick={closeScreenshot}>
+          <div
+            className="screenshot-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="screenshot-image-container">
+              {screenshotImage && (
+                <img
+                  src={screenshotImage}
+                  alt="Conversation screenshot"
+                  className="screenshot-preview-image"
+                />
+              )}
+            </div>
+            <div className="screenshot-actions">
+              <button
+                className="screenshot-button screenshot-secondary"
+                onClick={closeScreenshot}
+              >
+                Cancel
+              </button>
+              <button
+                className="screenshot-button screenshot-primary"
+                onClick={downloadImage}
+              >
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="input-container-fixed">
         <textarea
