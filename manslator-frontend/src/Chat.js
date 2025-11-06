@@ -54,7 +54,7 @@ const Chat = () => {
       clearInterval(dotsInterval);
       clearInterval(phraseInterval);
     };
-  }, [isLoading]);
+  }, [isLoading, typingPhrases.length]); // Added typingPhrases.length as dependency
 
   const sendMessage = async () => {
     if (!input.trim()) return;

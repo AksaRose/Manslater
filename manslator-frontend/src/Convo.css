@@ -589,7 +589,7 @@
 
 .input-container-fixed textarea {
   flex: 1;
-  padding: 8px 44px 8px 12px; /* smaller padding for compact layout */
+  padding: 8px 56px 8px 12px; /* increased right padding to account for larger button */
   border: none;
   border-radius: 20px;
   font-size: 16px;
@@ -615,11 +615,11 @@
 /* Send arrow button positioned inside the input box */
 .input-container-fixed .send-arrow-btn {
   position: absolute;
-  right: 20px; /* align with container padding */
+  right: 12px; /* moved more right by reducing right margin */
   top: 50%;
   transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  width: 38px; /* increased size */
+  height: 38px; /* increased size */
   padding: 0;
   background: #d81b60;
   color: white;
@@ -651,8 +651,8 @@
 }
 
 .input-container-fixed .send-arrow-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 18px; /* increased icon size to match larger button */
+  height: 18px; /* increased icon size to match larger button */
 }
 
 /* Old input-container styles - keep for backwards compatibility if needed elsewhere */
