@@ -17,6 +17,7 @@ const Chat = () => {
 
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+  const textareaRef = useRef(null);
   const API_URL = "https://manslater.onrender.com";
   // Typing indicator phrases and animation state
   const typingPhrases = [
@@ -242,6 +243,21 @@ const Chat = () => {
     }
   };
 
+  // Adjust textarea height to fit content
+  const adjustTextareaHeight = useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    // reset height to allow shrinking
+    ta.style.height = "auto";
+    // set to scrollHeight (limit controlled via CSS max-height)
+    ta.style.height = ta.scrollHeight + "px";
+  }, []);
+
+  // Keep textarea height in sync with value
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [input, adjustTextareaHeight]);
+
   const clearChat = async () => {
     if (sessionId) {
       try {
@@ -352,8 +368,10 @@ const Chat = () => {
 
       <div className="input-container-fixed">
         <textarea
+          ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onInput={adjustTextareaHeight}
           onKeyPress={handleKeyPress}
           placeholder="Type your message..."
           disabled={isLoading}

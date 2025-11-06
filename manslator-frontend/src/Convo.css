@@ -614,8 +614,12 @@
   color: #333;
   /* Use Stack Sans Headline for inputs; fall back to Inter then generic sans */
   font-family: "Stack Sans Headline", "Inter", sans-serif;
-  transition: all 0.3s ease;
-  max-height: 100px;
+  transition: height 0.12s ease, opacity 0.2s ease;
+  max-height: 120px; /* allow more room when expanding */
+  min-height: 40px;
+  height: auto; /* let JS control height */
+  overflow: hidden; /* hide native scrollbar - we use JS size */
+  box-sizing: border-box;
 }
 
 .input-container-fixed textarea:focus {
