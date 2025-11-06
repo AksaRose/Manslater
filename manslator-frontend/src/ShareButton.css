@@ -1,47 +1,28 @@
-/* Share button styles */
-.share-wrapper {
-  position: absolute;
-  right: -40px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-.share-wrapper.visible {
-  opacity: 1;
-}
-
 .share-button {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background: #d81b60;
-  border: none;
-  color: white;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  margin-left: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+  opacity: 0;
+  transform: scale(0.8);
+  box-shadow: 0 2px 8px rgba(242, 242, 242, 0.3);
+  border-radius: 40px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-.share-options {
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 8px;
-  width: 180px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  animation: slideIn 0.2s ease;
+.share-button.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.share-button:hover {
+  transform: translateY(-1px);
 }
 
 @keyframes slideIn {
@@ -74,13 +55,8 @@
 }
 
 .share-button:hover {
-  background: #c2185b;
-  transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
-}
-
-.share-button:active {
-  transform: translateY(-50%) scale(0.95);
+  background: #f06099;
+  box-shadow: 0 4px 12px rgba(255, 112, 164, 0.4);
 }
 
 .share-button svg {
