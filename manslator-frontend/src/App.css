@@ -108,7 +108,7 @@ h1 {
 }
 
 .message-bubble.user {
-  background-color: #4285f4;
+  background-color: #e91e63;
   color: white;
   border-bottom-right-radius: 5px;
 }
@@ -120,8 +120,9 @@ h1 {
 }
 
 .message-bubble.manslater.loading {
-  background-color: #ffe0b2;
+  background-color: #454545;
   font-style: italic;
+  color: #ffffff;
 }
 
 .input-area {
