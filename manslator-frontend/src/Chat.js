@@ -109,25 +109,71 @@ const Chat = () => {
       const response = await fetch(image);
       const blob = await response.blob();
 
-      // Try native sharing first
-      if (navigator.share) {
+      const file = new File([blob], "story.png", { type: "image/png" });
+
+      // 1) Prefer Web Share API with files (best experience on Android/Chrome)
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
         try {
-          await navigator.share({
-            files: [new File([blob], "story.png", { type: "image/png" })],
-            title: "Share to Instagram Story",
-          });
+          await navigator.share({ files: [file], title: "Share" });
           return;
-        } catch (error) {
-          console.log("Native sharing failed, trying deep link");
+        } catch (err) {
+          console.warn("navigator.share failed:", err);
         }
       }
 
-      // Try Instagram deep linking
-      const blobUrl = URL.createObjectURL(blob);
-      window.location.href = `instagram://story-camera?media=${encodeURIComponent(
-        blobUrl
-      )}`;
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+      // 2) Upload image to backend so we have a public HTTPS URL Instagram can access
+      try {
+        const form = new FormData();
+        form.append("file", file);
+
+        const uploadRes = await fetch(`${API_URL}/upload`, {
+          method: "POST",
+          body: form,
+        });
+        if (!uploadRes.ok) throw new Error("Upload failed");
+        const uploadData = await uploadRes.json();
+        const publicUrl = uploadData.url;
+
+        // Try to copy the public URL to clipboard so user can paste if needed
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          try {
+            await navigator.clipboard.writeText(publicUrl);
+          } catch (e) {
+            // ignore clipboard errors
+          }
+        }
+
+        // Open Instagram app - user may need to add the uploaded image manually from the URL or camera roll
+        // There's no reliable cross-platform deep link that programmatically attaches a web-hosted image from a URL.
+        // We'll open Instagram and provide the public URL in the clipboard to make attaching easier.
+        window.location.href = "instagram://story-camera";
+        return;
+      } catch (uploadErr) {
+        console.warn("Upload fallback failed:", uploadErr);
+      }
+
+      // 3) Final fallback: try to write to clipboard as an image (modern Chromium) then open IG
+      if (navigator.clipboard && window.ClipboardItem) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ [blob.type]: blob }),
+          ]);
+          window.location.href = "instagram://story-camera";
+          return;
+        } catch (err) {
+          console.warn("clipboard image write failed:", err);
+        }
+      }
+
+      // 4) If all else fails, trigger a download so the user can attach the image manually
+      const downloadUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = "manslater-story.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 3000);
     } catch (error) {
       console.error("Error sharing:", error);
     }

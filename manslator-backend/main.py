@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import os
 import json
 from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import UploadFile, File
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from together import Together
@@ -516,6 +518,11 @@ class Manslater:
 
 app = FastAPI(title="Manslater API", version="2.3.0")
 
+# Ensure uploads directory exists and serve it
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -682,6 +689,34 @@ async def chat(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
+
+
+@app.post('/upload')
+async def upload_image(request: Request, file: UploadFile = File(...)):
+    """Save uploaded image to uploads/ and return a public URL.
+
+    Note: This is a minimal, unauthenticated upload for convenience. In
+    production you'd add auth, rate-limiting, and remove long-term public
+    access or use signed URLs.
+    """
+    try:
+        # generate a safe filename
+        import time, secrets
+        ext = os.path.splitext(file.filename)[1] or ".png"
+        fname = f"{int(time.time())}_{secrets.token_hex(8)}{ext}"
+        dest = os.path.join(UPLOAD_DIR, fname)
+
+        contents = await file.read()
+        with open(dest, "wb") as f:
+            f.write(contents)
+
+        # Build public URL using request.base_url
+        base = str(request.base_url).rstrip("/")
+        public_url = f"{base}/uploads/{fname}"
+
+        return {"url": public_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {e}")
 
 @app.post("/translate", response_model=TranslateResponse)
 async def translate_text(request: TranslateRequest):
