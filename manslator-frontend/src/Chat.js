@@ -334,12 +334,11 @@ const Chat = () => {
                 >
                   {msg.content}
                 </div>
-                {msg.role === "ai" && (
-                  <ShareButton
-                    onCapture={handleShare}
-                    visible={index === messages.length - 1 && !isLoading}
-                  />
-                )}
+                {msg.role === "ai" &&
+                  index === messages.length - 1 &&
+                  !isLoading && (
+                    <ShareButton onCapture={handleShare} visible={true} />
+                  )}
               </div>
             </div>
           ))}
