@@ -11,3 +11,4 @@ together
 pydantic
 uvicorn
 redis
+python-multipart
