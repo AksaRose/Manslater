@@ -18,6 +18,7 @@ const Chat = () => {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const textareaRef = useRef(null);
+  const templateRef = useRef(null);
   const API_URL = "https://manslater.onrender.com";
   // Typing indicator phrases and animation state
   const typingPhrases = [
@@ -37,77 +38,207 @@ const Chat = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Preload the template image so capture doesn't wait on an onload
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = `${process.env.PUBLIC_URL}/images/template.jpg`;
+    templateRef.current = img;
+  }, []);
+
   const captureScreen = useCallback(async () => {
     if (!containerRef.current) return;
+    let messagesContainer = null;
+    let inputEl = null;
+    let originalPaddingBottom = null;
 
     try {
-      // Reset any transformations before capture
-      containerRef.current.style.transform = "none";
+      // Locate elements we need to adjust
+      if (containerRef.current) {
+        messagesContainer = containerRef.current.querySelector(
+          ".messages-container"
+        );
+      }
+      inputEl = document.querySelector(".input-container-fixed");
 
-      // Capture the conversation
-      const conversationCanvas = await html2canvas(containerRef.current, {
+      // If there's a messages container, temporarily add bottom padding so the
+      // fixed input doesn't cover the last bubble. We'll restore it in finally.
+      if (messagesContainer) {
+        originalPaddingBottom = messagesContainer.style.paddingBottom;
+        const inputHeight = inputEl
+          ? Math.ceil(inputEl.getBoundingClientRect().height)
+          : 0;
+        // increased buffer to avoid flush edges on some phones
+        messagesContainer.style.paddingBottom = `${inputHeight + 32}px`;
+
+        // Scroll to bottom so the latest messages are visible
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      // Wait two animation frames to allow layout and scroll to settle
+      await new Promise((res) =>
+        requestAnimationFrame(() => requestAnimationFrame(res))
+      );
+
+      // Ensure top and bottom visible bubbles are fully onscreen (not half-cut).
+      if (messagesContainer) {
+        const children = Array.from(
+          messagesContainer.querySelectorAll(".message-wrapper")
+        );
+
+        const containerRect = messagesContainer.getBoundingClientRect();
+
+        // If the first partially-visible message at the top exists, snap it fully into view
+        for (const child of children) {
+          const childRect = child.getBoundingClientRect();
+          const partiallyHiddenAtTop =
+            childRect.top < containerRect.top &&
+            childRect.bottom > containerRect.top;
+          if (partiallyHiddenAtTop) {
+            // Move scroll so this child's top is visible with a slightly larger gap
+            const gap = 16; // px
+            messagesContainer.scrollTop = Math.max(0, child.offsetTop - gap);
+            break;
+          }
+        }
+
+        // Recompute and ensure last child is fully visible as well
+        const last = children[children.length - 1];
+        if (last) {
+          const lastRect = last.getBoundingClientRect();
+          const newContainerRect = messagesContainer.getBoundingClientRect();
+          if (lastRect.bottom > newContainerRect.bottom) {
+            messagesContainer.scrollTop =
+              last.offsetTop +
+              last.offsetHeight -
+              messagesContainer.clientHeight +
+              8;
+          }
+        }
+
+        // Allow layout/paint to settle (small timeout is more reliable on some devices)
+        await new Promise((res) => setTimeout(res, 50));
+      }
+
+      // Reset any transformations before capture on the element we'll capture
+      const captureTarget = messagesContainer || containerRef.current;
+      captureTarget.style.transform = "none";
+
+      // Capture the conversation messages element (we only need the messages, not the full container)
+      const isMobile = window.innerWidth <= 768;
+      const dpr = window.devicePixelRatio || 1;
+      const canvasScale = isMobile
+        ? Math.min(1.6, dpr * 1.2)
+        : Math.min(2, dpr * 1.5);
+
+      const conversationCanvas = await html2canvas(captureTarget, {
         backgroundColor: null,
-        scale: 2,
+        scale: canvasScale,
       });
 
       // Create a new canvas for the final composition
       const finalCanvas = document.createElement("canvas");
       const ctx = finalCanvas.getContext("2d");
 
-      // Load the template image
+      // Try to use the preloaded template image (faster)
+      const tpl = templateRef.current;
+      const usedTemplate = tpl && tpl.complete ? tpl : null;
+
+      if (usedTemplate) {
+        finalCanvas.width = usedTemplate.width;
+        finalCanvas.height = usedTemplate.height;
+        ctx.drawImage(usedTemplate, 0, 0);
+
+        const verticalPadding = usedTemplate.height * (isMobile ? 0.15 : 0.25);
+        const horizontalPadding = usedTemplate.width * (isMobile ? 0.05 : 0.1);
+
+        const availableWidth = usedTemplate.width - horizontalPadding * 2;
+        const availableHeight = usedTemplate.height - verticalPadding * 2;
+
+        const scale =
+          Math.min(
+            availableWidth / conversationCanvas.width,
+            availableHeight / conversationCanvas.height
+          ) * (isMobile ? 1.1 : 0.95);
+
+        const scaledWidth = conversationCanvas.width * scale;
+        const scaledHeight = conversationCanvas.height * scale;
+
+        const x = (usedTemplate.width - scaledWidth) / 2;
+        const y = usedTemplate.height * 0.52 - scaledHeight / 2;
+
+        ctx.drawImage(conversationCanvas, x, y, scaledWidth, scaledHeight);
+
+        // Return a Blob directly (avoid dataURL and extra fetch)
+        return await new Promise((resolve) => {
+          finalCanvas.toBlob((blob) => resolve(blob), "image/png", 0.95);
+        });
+      }
+
+      // Fallback: load template if preload not ready
       const templateImage = new Image();
       templateImage.crossOrigin = "anonymous";
       templateImage.src = `${process.env.PUBLIC_URL}/images/template.jpg`;
+      await new Promise((res, rej) => {
+        templateImage.onload = res;
+        templateImage.onerror = rej;
+      });
 
-      return new Promise((resolve, reject) => {
-        templateImage.onload = () => {
-          finalCanvas.width = templateImage.width;
-          finalCanvas.height = templateImage.height;
+      finalCanvas.width = templateImage.width;
+      finalCanvas.height = templateImage.height;
+      ctx.drawImage(templateImage, 0, 0);
 
-          // Draw template first
-          ctx.drawImage(templateImage, 0, 0);
+      const verticalPadding = templateImage.height * (isMobile ? 0.15 : 0.25);
+      const horizontalPadding = templateImage.width * (isMobile ? 0.05 : 0.1);
 
-          // Calculate optimal positioning for conversation
-          const isMobile = window.innerWidth <= 768;
-          const verticalPadding =
-            templateImage.height * (isMobile ? 0.15 : 0.25);
-          const horizontalPadding =
-            templateImage.width * (isMobile ? 0.05 : 0.1);
+      const availableWidth = templateImage.width - horizontalPadding * 2;
+      const availableHeight = templateImage.height - verticalPadding * 2;
 
-          const availableWidth = templateImage.width - horizontalPadding * 2;
-          const availableHeight = templateImage.height - verticalPadding * 2;
+      const scale =
+        Math.min(
+          availableWidth / conversationCanvas.width,
+          availableHeight / conversationCanvas.height
+        ) * (isMobile ? 1.1 : 0.95);
 
-          const scale =
-            Math.min(
-              availableWidth / conversationCanvas.width,
-              availableHeight / conversationCanvas.height
-            ) * (isMobile ? 1.1 : 0.95);
+      const scaledWidth = conversationCanvas.width * scale;
+      const scaledHeight = conversationCanvas.height * scale;
 
-          const scaledWidth = conversationCanvas.width * scale;
-          const scaledHeight = conversationCanvas.height * scale;
+      const x = (templateImage.width - scaledWidth) / 2;
+      const y = templateImage.height * 0.52 - scaledHeight / 2;
 
-          const x = (templateImage.width - scaledWidth) / 2;
-          const y = templateImage.height * 0.45 - scaledHeight / 2;
+      ctx.drawImage(conversationCanvas, x, y, scaledWidth, scaledHeight);
 
-          // Draw conversation on top
-          ctx.drawImage(conversationCanvas, x, y, scaledWidth, scaledHeight);
-
-          const image = finalCanvas.toDataURL("image/png");
-          resolve(image);
-        };
-        templateImage.onerror = reject;
+      return await new Promise((resolve) => {
+        finalCanvas.toBlob((blob) => resolve(blob), "image/png", 0.95);
       });
     } catch (error) {
       console.error("Error capturing conversation:", error);
       throw error;
+    } finally {
+      // revert temporary padding we set earlier (if any)
+      try {
+        if (messagesContainer && originalPaddingBottom !== null) {
+          messagesContainer.style.paddingBottom = originalPaddingBottom;
+        }
+      } catch (e) {
+        // ignore
+      }
     }
   }, []);
 
   const handleShare = useCallback(async () => {
     try {
-      const image = await captureScreen();
-      const response = await fetch(image);
-      const blob = await response.blob();
+      // captureScreen now returns a Blob (preferred) or a data URL as fallback
+      let captureResult = await captureScreen();
+      let blob = null;
+      if (captureResult instanceof Blob) {
+        blob = captureResult;
+      } else if (typeof captureResult === "string") {
+        const resp = await fetch(captureResult);
+        blob = await resp.blob();
+      } else {
+        throw new Error("Unexpected capture result type");
+      }
 
       const file = new File([blob], "story.png", { type: "image/png" });
 
