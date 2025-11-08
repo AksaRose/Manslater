@@ -531,7 +531,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
         "https://manslater.in",
-        "https://www.manslater.in"
+        "https://www.manslater.in",
+        "https://zlz7jsh7-3000.inc1.devtunnels.ms"
     ],
     allow_credentials=True,
     allow_methods=["*"],
