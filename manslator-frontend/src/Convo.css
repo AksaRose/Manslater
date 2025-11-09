@@ -612,7 +612,7 @@
 
 .input-container-fixed textarea {
   flex: 1;
-  padding: 8px 56px 8px 12px; /* increased right padding to account for larger button */
+  padding: 8px 96px 8px 12px; /* increased right padding for both buttons */
   border: none;
   border-radius: 20px;
   font-size: 16px;
@@ -639,12 +639,72 @@
   cursor: not-allowed;
 }
 
-/* Send arrow button positioned inside the input box */
-.input-container-fixed .send-arrow-btn {
+/* Button container for mic and send buttons */
+.input-container-fixed .input-buttons {
   position: absolute;
-  right: 12px; /* moved more right by reducing right margin */
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  flex-direction: row; /* Ensure left-to-right order */
+  gap: 8px;
+  align-items: center;
+}
+
+/* Microphone button */
+.input-container-fixed .mic-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  order: 1; /* Force mic button to appear first (left) */
+}
+
+.input-container-fixed .mic-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+.input-container-fixed .mic-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.input-container-fixed .mic-btn.listening {
+  animation: breathe 2s ease-in-out infinite;
+}
+
+/* Breathing animation for recording state */
+@keyframes breathe {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.input-container-fixed .mic-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Send arrow button positioned inside the input box */
+.input-container-fixed .send-arrow-btn {
   width: 38px; /* increased size */
   height: 38px; /* increased size */
   padding: 0;
@@ -658,11 +718,17 @@
   justify-content: center;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+  /* Ensure flex participation inside .input-buttons and avoid old absolute rules */
+  position: static;
+  right: auto;
+  top: auto;
+  transform: none;
+  order: 2; /* Force send button to appear second (right) */
 }
 
 .input-container-fixed .send-arrow-btn:hover:not(:disabled) {
   background: #c2185b;
-  transform: translateY(-50%) scale(1.05);
+  transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
 }
 
@@ -674,7 +740,7 @@
 }
 
 .input-container-fixed .send-arrow-btn:active:not(:disabled) {
-  transform: translateY(-50%) scale(0.95);
+  transform: scale(0.95);
 }
 
 .input-container-fixed .send-arrow-btn svg {
@@ -722,8 +788,8 @@
   cursor: not-allowed;
 }
 
-/* Send arrow button positioned inside the input box */
-.send-arrow-btn {
+/* Send arrow button positioned inside the legacy .input-container */
+.input-container .send-arrow-btn {
   position: absolute;
   right: 28px; /* align with input padding */
   top: 50%;
@@ -743,24 +809,24 @@
   box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
 }
 
-.send-arrow-btn:hover:not(:disabled) {
+.input-container .send-arrow-btn:hover:not(:disabled) {
   background: #c2185b;
   transform: translateY(-50%) scale(1.05);
   box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
 }
 
-.send-arrow-btn:disabled {
+.input-container .send-arrow-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   background: #999;
   box-shadow: none;
 }
 
-.send-arrow-btn:active:not(:disabled) {
+.input-container .send-arrow-btn:active:not(:disabled) {
   transform: translateY(-50%) scale(0.95);
 }
 
-.send-arrow-btn svg {
+.input-container .send-arrow-btn svg {
   width: 18px;
   height: 18px;
 }

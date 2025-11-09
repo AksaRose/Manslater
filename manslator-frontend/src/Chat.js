@@ -14,11 +14,14 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
 
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const textareaRef = useRef(null);
   const templateRef = useRef(null);
+  const recognitionRef = useRef(null);
   const API_URL = "https://manslater.onrender.com";
   // Typing indicator phrases and animation state
   const typingPhrases = [
@@ -44,6 +47,56 @@ const Chat = () => {
     img.crossOrigin = "anonymous";
     img.src = `${process.env.PUBLIC_URL}/images/template.jpg`;
     templateRef.current = img;
+  }, []);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      setSpeechSupported(true);
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+
+        // Update input with the latest transcript
+        if (transcript.trim()) {
+          setInput(transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    } else {
+      setSpeechSupported(false);
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
   }, []);
 
   const captureScreen = useCallback(async () => {
@@ -310,6 +363,20 @@ const Chat = () => {
     }
   }, [captureScreen]);
 
+  // Voice recording handlers
+  const startListening = useCallback(() => {
+    if (recognitionRef.current && speechSupported && !isListening) {
+      setInput(""); // Clear current input when starting voice input
+      recognitionRef.current.start();
+    }
+  }, [speechSupported, isListening]);
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+    }
+  }, [isListening]);
+
   // Manage typing indicator animation while loading
   useEffect(() => {
     if (!isLoading) {
@@ -558,25 +625,59 @@ const Chat = () => {
           disabled={isLoading}
           rows="1"
         />
-        <button
-          onClick={sendMessage}
-          disabled={isLoading || !input.trim()}
-          className="send-arrow-btn"
-          aria-label="Send message"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="input-buttons">
+          {speechSupported && (
+            <button
+              onClick={isListening ? stopListening : startListening}
+              disabled={isLoading}
+              className={`mic-btn ${isListening ? "listening" : ""}`}
+              aria-label={isListening ? "Stop recording" : "Start voice input"}
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {isListening ? (
+                  // Stop icon
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                ) : (
+                  // Microphone icon
+                  <>
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                    <line x1="8" y1="23" x2="16" y2="23" />
+                  </>
+                )}
+              </svg>
+            </button>
+          )}
+          <button
+            onClick={sendMessage}
+            disabled={isLoading || !input.trim()}
+            className="send-arrow-btn"
+            aria-label="Send message"
           >
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
     </>
   );
