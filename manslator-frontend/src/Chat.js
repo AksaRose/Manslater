@@ -403,6 +403,15 @@ const Chat = () => {
   }, [isLoading, typingPhrases.length]); // Added typingPhrases.length as dependency
 
   const sendMessage = async () => {
+    // If voice recording is active, stop it when the user submits
+    try {
+      if (isListening && recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    } catch (e) {
+      // ignore errors from stopping recognition
+    }
+
     if (!input.trim()) return;
 
     const userMessage = input.trim();
