@@ -21,6 +21,7 @@ const Chat = () => {
   const containerRef = useRef(null);
   const textareaRef = useRef(null);
   const templateRef = useRef(null);
+  const ignoreRecognitionRef = useRef(false);
   const recognitionRef = useRef(null);
   const API_URL = "https://manslater.onrender.com";
   // Typing indicator phrases and animation state
@@ -67,6 +68,9 @@ const Chat = () => {
       };
 
       recognition.onresult = (event) => {
+        // If we've signaled to ignore recognition results (e.g., user just submitted), skip
+        if (ignoreRecognitionRef.current) return;
+
         let transcript = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           transcript += event.results[i][0].transcript;
@@ -85,6 +89,8 @@ const Chat = () => {
 
       recognition.onend = () => {
         setIsListening(false);
+        // Clear any ignore flag when recognition fully stops
+        ignoreRecognitionRef.current = false;
       };
 
       recognitionRef.current = recognition;
@@ -366,6 +372,8 @@ const Chat = () => {
   // Voice recording handlers
   const startListening = useCallback(() => {
     if (recognitionRef.current && speechSupported && !isListening) {
+      // Ensure we accept recognition results while listening
+      ignoreRecognitionRef.current = false;
       setInput(""); // Clear current input when starting voice input
       recognitionRef.current.start();
     }
@@ -403,9 +411,11 @@ const Chat = () => {
   }, [isLoading, typingPhrases.length]); // Added typingPhrases.length as dependency
 
   const sendMessage = async () => {
-    // If voice recording is active, stop it when the user submits
+    // If voice recording is active, stop it when the user submits and ignore any
+    // recognition results that may arrive as it winds down.
     try {
       if (isListening && recognitionRef.current) {
+        ignoreRecognitionRef.current = true;
         recognitionRef.current.stop();
       }
     } catch (e) {
