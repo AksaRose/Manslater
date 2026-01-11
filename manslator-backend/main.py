@@ -190,6 +190,42 @@ def generate_device_id(request: Request, user_agent: Optional[str] = None) -> st
 
 together_client = Together(api_key=TOGETHER_API_KEY)
 
+# ============ TIMEOUT WRAPPER FOR TOGETHER API ============
+
+def call_together_api_with_timeout(func, *args, **kwargs):
+    """
+    Wrap Together API calls with timeout using threading
+    Prevents hanging requests that cause health check failures
+    """
+    import threading
+    import queue
+    
+    result_queue = queue.Queue()
+    exception_queue = queue.Queue()
+    
+    def call_api():
+        try:
+            result = func(*args, **kwargs)
+            result_queue.put(result)
+        except Exception as e:
+            exception_queue.put(e)
+    
+    thread = threading.Thread(target=call_api, daemon=True)
+    thread.start()
+    thread.join(timeout=TOGETHER_API_TIMEOUT)
+    
+    if thread.is_alive():
+        print(f"⚠️ Together API call timed out after {TOGETHER_API_TIMEOUT}s")
+        raise TimeoutError(f"API call timed out after {TOGETHER_API_TIMEOUT} seconds")
+    
+    if not exception_queue.empty():
+        raise exception_queue.get()
+    
+    if not result_queue.empty():
+        return result_queue.get()
+    
+    raise TimeoutError("API call failed to return result")
+
 # ============ GLOBAL RATE LIMITING ============
 
 # Simple in-memory rate limiter for global request limiting
@@ -286,7 +322,9 @@ USER MESSAGE: "{user_message}"
 Respond with ONLY one word: TRANSLATE or CHAT"""
 
     try:
-        response = together_client.chat.completions.create(
+        # Use timeout wrapper to prevent blocking
+        response = call_together_api_with_timeout(
+            together_client.chat.completions.create,
             model=ROAST_MODEL,
             messages=[
                 {"role": "system", "content": "You are a binary classifier. Respond with only: TRANSLATE or CHAT"},
@@ -342,7 +380,9 @@ Generate ONLY the roast (3-4 words + emoji):
 {user_question}"""
 
     try:
-        response = together_client.chat.completions.create(
+        # Use timeout wrapper to prevent blocking
+        response = call_together_api_with_timeout(
+            together_client.chat.completions.create,
             model=ROAST_MODEL,
             messages=[
                 {"role": "system", "content": "Ultra-short savage roasts. Max 4 words + emoji."},
@@ -377,7 +417,9 @@ def generate_advice(user_question: str, conversation_history: List = None) -> st
     messages.append({"role": "user", "content": user_question})
     
     try:
-        response = together_client.chat.completions.create(
+        # Use timeout wrapper to prevent blocking
+        response = call_together_api_with_timeout(
+            together_client.chat.completions.create,
             model=FINE_TUNED_MODEL,
             messages=messages,
             max_tokens=150,
@@ -442,7 +484,9 @@ YOUR SAVAGE RESPONSE (1-2 sentences max):"""
         history_text = "[First message]"
     
     try:
-        response = together_client.chat.completions.create(
+        # Use timeout wrapper to prevent blocking
+        response = call_together_api_with_timeout(
+            together_client.chat.completions.create,
             model=ROAST_MODEL,
             messages=[
                 {"role": "system", "content": "You are ManSlater. Be savage, mocking, and brutally honest. Keep responses SHORT (1-2 sentences). Always include emoji."},
@@ -678,18 +722,33 @@ async def root():
 @app.get("/health")
 @app.head("/health")
 async def health_check():
+    """
+    Health check endpoint - must respond quickly (< 1 second)
+    Platform health checks will kill the service if this times out
+    """
     try:
-        redis_manager.client.ping()
-        redis_status = "connected"
+        # Quick Redis check with timeout - don't block health check
+        try:
+            # Use asyncio timeout to prevent hanging
+            redis_ping = await asyncio.wait_for(
+                asyncio.to_thread(redis_manager.client.ping),
+                timeout=0.5  # 500ms max for health check
+            )
+            redis_status = "connected" if redis_ping else "disconnected"
+        except (asyncio.TimeoutError, Exception):
+            redis_status = "disconnected"
     except:
         redis_status = "disconnected"
     
+    # Always return healthy - don't fail health check due to Redis
+    # The service can still function without Redis (graceful degradation)
     return {
         "status": "healthy",
         "fine_tuned_model": FINE_TUNED_MODEL,
         "roast_model": ROAST_MODEL,
         "redis": redis_status,
-        "features": ["intent_classification", "dual_mode_responses"]
+        "features": ["intent_classification", "dual_mode_responses"],
+        "timestamp": time.time()
     }
 
 @app.get("/rate-limit", response_model=RateLimitInfo)
@@ -785,8 +844,11 @@ async def chat(
             # Get response (intent detection happens inside)
             response_text = advisor.send_message(request_body.message)
             
-            # Detect intent for response metadata
-            detected_intent = classify_intent(request_body.message)
+            # Detect intent for response metadata (async wrapper for non-blocking)
+            try:
+                detected_intent = await asyncio.to_thread(classify_intent, request_body.message)
+            except:
+                detected_intent = "chat"  # Fallback
             
             try:
                 new_usage = redis_manager.increment_device_usage(device_id)
