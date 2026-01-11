@@ -17,6 +17,10 @@ import redis
 from datetime import timedelta
 import hashlib
 import random
+import asyncio
+import time
+from collections import defaultdict
+from functools import wraps
 
 # ============ ENVIRONMENT SETUP ============
 load_dotenv()
@@ -36,23 +40,35 @@ REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)
 CHAT_LIMIT_PER_DEVICE = int(os.getenv("CHAT_LIMIT_PER_DEVICE", 5))
 RATE_LIMIT_TTL = int(os.getenv("RATE_LIMIT_TTL", 86400))
 
+# API Timeouts
+TOGETHER_API_TIMEOUT = int(os.getenv("TOGETHER_API_TIMEOUT", 30))  # 30 seconds timeout
+MAX_CONCURRENT_REQUESTS = int(os.getenv("MAX_CONCURRENT_REQUESTS", 50))  # Global rate limit
+
+# Memory management
+MAX_ACTIVE_INSTANCES = int(os.getenv("MAX_ACTIVE_INSTANCES", 1000))  # Limit active instances
+INSTANCE_CLEANUP_INTERVAL = int(os.getenv("INSTANCE_CLEANUP_INTERVAL", 300))  # 5 minutes
+
 os.environ["OPENAI_API_KEY"] = TOGETHER_API_KEY
 
 # ============ REDIS SETUP ============
 
 class RedisManager:
-    """Manages Redis connections and operations"""
+    """Manages Redis connections and operations with connection pooling"""
     
     def __init__(self):
-        self.client = redis.Redis(
+        # Use connection pool for better performance
+        self.pool = redis.ConnectionPool(
             host=REDIS_HOST,
             port=REDIS_PORT,
             db=REDIS_DB,
             password=REDIS_PASSWORD,
             decode_responses=True,
             socket_connect_timeout=5,
-            socket_timeout=5
+            socket_timeout=5,
+            max_connections=50,  # Connection pool size
+            retry_on_timeout=True
         )
+        self.client = redis.Redis(connection_pool=self.pool)
         self._test_connection()
     
     def _test_connection(self):
@@ -61,7 +77,8 @@ class RedisManager:
             print("✅ Redis connection established")
         except redis.ConnectionError as e:
             print(f"❌ Redis connection failed: {e}")
-            raise
+            # Don't raise - allow graceful degradation
+            print("⚠️  Continuing without Redis (rate limiting disabled)")
     
     def get_device_usage(self, device_id: str) -> int:
         key = f"rate_limit:device:{device_id}:chat_count"
@@ -172,6 +189,42 @@ def generate_device_id(request: Request, user_agent: Optional[str] = None) -> st
 # ============ INTENT CLASSIFICATION ============
 
 together_client = Together(api_key=TOGETHER_API_KEY)
+
+# ============ GLOBAL RATE LIMITING ============
+
+# Simple in-memory rate limiter for global request limiting
+_concurrent_requests = 0
+_max_concurrent = MAX_CONCURRENT_REQUESTS
+_request_lock = asyncio.Lock() if hasattr(asyncio, 'Lock') else None
+
+async def check_global_rate_limit():
+    """Check if we've exceeded global concurrent request limit"""
+    global _concurrent_requests
+    if _request_lock:
+        async with _request_lock:
+            if _concurrent_requests >= _max_concurrent:
+                raise HTTPException(
+                    status_code=503,
+                    detail=f"Server overloaded. Please try again in a moment. ({_concurrent_requests}/{_max_concurrent} concurrent requests)"
+                )
+            _concurrent_requests += 1
+    else:
+        # Fallback for older Python versions
+        if _concurrent_requests >= _max_concurrent:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Server overloaded. Please try again in a moment."
+            )
+        _concurrent_requests += 1
+
+async def release_global_rate_limit():
+    """Release a request from the global counter"""
+    global _concurrent_requests
+    if _request_lock:
+        async with _request_lock:
+            _concurrent_requests = max(0, _concurrent_requests - 1)
+    else:
+        _concurrent_requests = max(0, _concurrent_requests - 1)
 
 def classify_intent(user_message: str) -> str:
     """
@@ -539,7 +592,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ============ MEMORY MANAGEMENT ============
+
 active_instances = {}
+_instance_access_times = {}  # Track last access time for cleanup
+
+def cleanup_old_instances():
+    """Remove instances that haven't been accessed recently"""
+    global active_instances, _instance_access_times
+    
+    current_time = time.time()
+    sessions_to_remove = []
+    
+    for session_id, last_access in list(_instance_access_times.items()):
+        # Remove instances not accessed in last 30 minutes
+        if current_time - last_access > 1800:  # 30 minutes
+            sessions_to_remove.append(session_id)
+    
+    for session_id in sessions_to_remove:
+        if session_id in active_instances:
+            del active_instances[session_id]
+        if session_id in _instance_access_times:
+            del _instance_access_times[session_id]
+    
+    # If we're still over the limit, remove oldest instances
+    if len(active_instances) > MAX_ACTIVE_INSTANCES:
+        sorted_sessions = sorted(
+            _instance_access_times.items(),
+            key=lambda x: x[1]
+        )
+        to_remove = len(active_instances) - MAX_ACTIVE_INSTANCES
+        for session_id, _ in sorted_sessions[:to_remove]:
+            if session_id in active_instances:
+                del active_instances[session_id]
+            if session_id in _instance_access_times:
+                del _instance_access_times[session_id]
+    
+    return len(sessions_to_remove)
 
 # ============ MODELS ============
 
@@ -629,66 +718,105 @@ async def chat(
     - CHAT mode: "Hey bro" → Savage banter
     """
     try:
-        device_id = generate_device_id(request, user_agent)
-        rate_info = redis_manager.check_rate_limit(device_id)
+        # Global rate limiting
+        await check_global_rate_limit()
         
-        if not rate_info["allowed"]:
-            ttl = redis_manager.get_device_ttl(device_id)
-            hours_remaining = ttl // 3600
-            minutes_remaining = (ttl % 3600) // 60
+        try:
+            device_id = generate_device_id(request, user_agent)
+            try:
+                rate_info = redis_manager.check_rate_limit(device_id)
+            except Exception as redis_err:
+                # Graceful degradation if Redis is down
+                print(f"Redis error in rate limit check: {redis_err}")
+                rate_info = {"allowed": True, "current_usage": 0, "limit": CHAT_LIMIT_PER_DEVICE, "remaining": CHAT_LIMIT_PER_DEVICE}
             
-            rate_limit_message = f"Rate limit hit 😐\nYou've used all {CHAT_LIMIT_PER_DEVICE} chats. Try again in {hours_remaining}h {minutes_remaining}m."
+            if not rate_info["allowed"]:
+                try:
+                    ttl = redis_manager.get_device_ttl(device_id)
+                except:
+                    ttl = RATE_LIMIT_TTL
+                hours_remaining = ttl // 3600
+                minutes_remaining = (ttl % 3600) // 60
+                
+                rate_limit_message = f"Rate limit hit 😐\nYou've used all {CHAT_LIMIT_PER_DEVICE} chats. Try again in {hours_remaining}h {minutes_remaining}m."
+                
+                session_id = request_body.session_id or f"session_{os.urandom(8).hex()}"
+                try:
+                    redis_manager.save_chat_message(session_id, "user", request_body.message)
+                    redis_manager.save_chat_message(session_id, "assistant", rate_limit_message)
+                except:
+                    pass  # Continue even if Redis fails
+                
+                raise HTTPException(
+                    status_code=429,
+                    detail={
+                        "error": "Rate limit exceeded",
+                        "message": rate_limit_message,
+                        "current_usage": rate_info["current_usage"],
+                        "limit": rate_info["limit"],
+                        "reset_in_seconds": ttl,
+                        "device_id": device_id
+                    }
+                )
+            
+            try:
+                redis_manager.increment_request_count("chat")
+            except:
+                pass  # Continue even if Redis fails
             
             session_id = request_body.session_id or f"session_{os.urandom(8).hex()}"
-            redis_manager.save_chat_message(session_id, "user", request_body.message)
-            redis_manager.save_chat_message(session_id, "assistant", rate_limit_message)
             
-            raise HTTPException(
-                status_code=429,
-                detail={
-                    "error": "Rate limit exceeded",
-                    "message": rate_limit_message,
-                    "current_usage": rate_info["current_usage"],
-                    "limit": rate_info["limit"],
-                    "reset_in_seconds": ttl,
-                    "device_id": device_id
+            # Cleanup old instances periodically
+            if len(active_instances) > MAX_ACTIVE_INSTANCES * 0.9:  # Cleanup at 90% capacity
+                cleanup_old_instances()
+            
+            # Get or create instance with memory management
+            if session_id not in active_instances:
+                # Check limit before creating
+                if len(active_instances) >= MAX_ACTIVE_INSTANCES:
+                    cleanup_old_instances()
+                active_instances[session_id] = Manslater(session_id)
+            
+            # Update access time
+            _instance_access_times[session_id] = time.time()
+            
+            advisor = active_instances[session_id]
+            
+            # Get response (intent detection happens inside)
+            response_text = advisor.send_message(request_body.message)
+            
+            # Detect intent for response metadata
+            detected_intent = classify_intent(request_body.message)
+            
+            try:
+                new_usage = redis_manager.increment_device_usage(device_id)
+                updated_rate_info = redis_manager.check_rate_limit(device_id)
+                ttl = redis_manager.get_device_ttl(device_id)
+            except:
+                updated_rate_info = rate_info
+                ttl = RATE_LIMIT_TTL
+            
+            return ChatResponse(
+                response=response_text,
+                session_id=session_id,
+                intent=detected_intent,  # NEW: Show what mode was used
+                rate_limit_info={
+                    "current_usage": updated_rate_info["current_usage"],
+                    "limit": updated_rate_info["limit"],
+                    "remaining": updated_rate_info["remaining"],
+                    "reset_in_seconds": ttl
                 }
             )
-        
-        redis_manager.increment_request_count("chat")
-        
-        session_id = request_body.session_id or f"session_{os.urandom(8).hex()}"
-        
-        if session_id not in active_instances:
-            active_instances[session_id] = Manslater(session_id)
-        
-        advisor = active_instances[session_id]
-        
-        # Get response (intent detection happens inside)
-        response_text = advisor.send_message(request_body.message)
-        
-        # Detect intent for response metadata
-        detected_intent = classify_intent(request_body.message)
-        
-        new_usage = redis_manager.increment_device_usage(device_id)
-        updated_rate_info = redis_manager.check_rate_limit(device_id)
-        ttl = redis_manager.get_device_ttl(device_id)
-        
-        return ChatResponse(
-            response=response_text,
-            session_id=session_id,
-            intent=detected_intent,  # NEW: Show what mode was used
-            rate_limit_info={
-                "current_usage": updated_rate_info["current_usage"],
-                "limit": updated_rate_info["limit"],
-                "remaining": updated_rate_info["remaining"],
-                "reset_in_seconds": ttl
-            }
-        )
+        finally:
+            # Always release global rate limit
+            await release_global_rate_limit()
     
     except HTTPException:
+        await release_global_rate_limit()
         raise
     except Exception as e:
+        await release_global_rate_limit()
+        print(f"Chat error: {e}")
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
 
 
