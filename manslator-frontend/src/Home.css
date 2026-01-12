@@ -154,6 +154,16 @@ body.page-transition-out .home-root {
   text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
   margin: 0 0 12px 0;
   z-index: 3;
+  /* Prevent flash of unstyled text */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+
+/* Show text once font is loaded */
+.fonts-loaded .home-hero-title {
+  visibility: visible;
+  opacity: 1;
 }
 
 .home-hero-title::before {

@@ -203,6 +203,16 @@
   color: #d81b60;
   text-shadow: 0px 1px 12px rgba(0, 0, 0, 0.09);
   margin-top: 12px;
+  /* Prevent flash of unstyled text */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+
+/* Show text once font is loaded */
+.fonts-loaded .hero-title {
+  visibility: visible;
+  opacity: 1;
 }
 
 .hero-subtitle {

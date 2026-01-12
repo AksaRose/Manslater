@@ -10,33 +10,21 @@
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Translator you didn't know you needed" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/images/dfds.png" />
+    <!-- Preload Shopie font (used for Manslater title) - critical for preventing font flash -->
     <link
       rel="preload"
       href="/fonts/Shopie.woff2"
       as="font"
       type="font/woff2"
-      crossorigin
+      crossorigin="anonymous"
     />
+    <!-- Preload Trivia Grotesk font -->
     <link
       rel="preload"
       href="/fonts/trivia-grotesk-n3-bold.woff2"
       as="font"
       type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/Shopie.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/Trivia-grotesk.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
+      crossorigin="anonymous"
     />
     <!--
       manifest.json provides metadata used when your web app is installed on a
