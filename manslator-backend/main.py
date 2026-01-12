@@ -213,11 +213,77 @@ def call_together_api_with_timeout(func, *args, **kwargs):
     
     raise TimeoutError("API call failed to return result")
 
-def classify_intent(user_message: str) -> str:
+def classify_intent_fast(user_message: str) -> str:
     """
-    Classify if user wants TRANSLATION or just CHATTING
+    Ultra-fast intent classification using only heuristics (no API call)
+    Used for metadata and when speed is critical
     Returns: "translate" or "chat"
     """
+    if not user_message or not user_message.strip():
+        return "chat"
+    
+    msg_lower = user_message.lower().strip()
+    
+    # Strong translation indicators
+    if (
+        '"' in user_message or "'" in user_message or
+        "she said" in msg_lower or "she texted" in msg_lower or
+        "she wrote" in msg_lower or "her message" in msg_lower or
+        ("what does" in msg_lower and ("mean" in msg_lower or "she" in msg_lower)) or
+        "decode" in msg_lower or
+        (msg_lower.startswith(("she said", "she texted", "she told")))
+    ):
+        return "translate"
+    
+    # Default to chat (most common case)
+    return "chat"
+
+def classify_intent(user_message: str) -> str:
+    """
+    Fast intent classification - uses heuristics first, LLM only when needed
+    Since most users are just chatting, we default to chat and only use LLM for uncertain cases
+    Returns: "translate" or "chat"
+    """
+    if not user_message or not user_message.strip():
+        return "chat"
+    
+    msg_lower = user_message.lower().strip()
+    
+    # ============ FAST HEURISTIC CLASSIFICATION (No API call) ============
+    # Strong translation indicators - these are almost always translations
+    strong_translate_patterns = [
+        '"' in user_message or "'" in user_message,  # Contains quotes
+        "she said" in msg_lower,
+        "she texted" in msg_lower,
+        "she wrote" in msg_lower,
+        "her message" in msg_lower,
+        "what does" in msg_lower and ("mean" in msg_lower or "she" in msg_lower),
+        "decode" in msg_lower,
+        "translate" in msg_lower and "this" in msg_lower,
+        msg_lower.startswith(("she said", "she texted", "she told")),
+    ]
+    
+    if any(strong_translate_patterns):
+        return "translate"
+    
+    # Strong chat indicators - common greetings and casual chat
+    strong_chat_patterns = [
+        msg_lower.startswith(("hey", "hi", "hello", "yo", "sup", "what's up", "whats up")),
+        msg_lower.startswith(("bro", "dude", "man")),
+        msg_lower in ["what now", "what now?", "help", "help me"],
+        "i'm" in msg_lower and any(word in msg_lower for word in ["confused", "screwed", "lost", "stuck"]),
+        "should i" in msg_lower,
+        "what do i" in msg_lower,
+        "what should" in msg_lower,
+        msg_lower.startswith(("ok", "okay", "alright", "alright")),
+    ]
+    
+    if any(strong_chat_patterns):
+        return "chat"
+    
+    # ============ UNCERTAIN CASES - Use LLM (only when needed) ============
+    # For ambiguous cases, use LLM classification
+    # This is much faster since most messages are caught by heuristics above
     
     classification_prompt = """You are an intent classifier for ManSlater, a savage relationship advice bot.
 
@@ -292,16 +358,12 @@ Respond with ONLY one word: TRANSLATE or CHAT"""
         elif "CHAT" in intent:
             return "chat"
         else:
-            # Default: if uncertain, check for quotes as fallback
-            if any(q in user_message.lower() for q in ['"', "'", "she said", "she texted", "her message"]):
-                return "translate"
+            # Default to chat if uncertain (most common case)
             return "chat"
             
     except Exception as e:
         print(f"Intent classification error: {e}")
-        # Safe fallback: check for translation signals
-        if any(q in user_message.lower() for q in ['"', "'", "she said", "she texted", "what does", "decode", "translate"]):
-            return "translate"
+        # Default to chat on error (most common case, safer fallback)
         return "chat"
 
 # ============ TRANSLATION MODE (Original) ============
@@ -726,8 +788,8 @@ async def chat(
         # Get response (intent detection happens inside)
         response_text = advisor.send_message(request_body.message)
         
-        # Detect intent for response metadata
-        detected_intent = classify_intent(request_body.message)
+        # Detect intent for response metadata (use fast heuristic version - no API call)
+        detected_intent = classify_intent_fast(request_body.message)
         
         new_usage = redis_manager.increment_device_usage(device_id)
         updated_rate_info = redis_manager.check_rate_limit(device_id)
