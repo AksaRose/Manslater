@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
 export default function Home() {
   const navigate = useNavigate();
+
+  // Prefetch the Convo page and its dependencies when user hovers or after a delay
+  useEffect(() => {
+    // Prefetch after 1 second of being on the page
+    const prefetchTimer = setTimeout(() => {
+      // Prefetch the Convo component
+      import("./Convo");
+      import("./Chat");
+      import("./Convo.css");
+    }, 1000);
+
+    // Also prefetch on mouse move (user is likely to click)
+    const handleMouseMove = () => {
+      import("./Convo");
+      import("./Chat");
+      import("./Convo.css");
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { once: true });
+    window.addEventListener("touchstart", handleMouseMove, { once: true });
+
+    return () => {
+      clearTimeout(prefetchTimer);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchstart", handleMouseMove);
+    };
+  }, []);
 
   const handleClick = () => {
     // play a small page-out transition then navigate

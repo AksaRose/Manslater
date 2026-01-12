@@ -31,28 +31,9 @@
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!-- Local Shopie font (served from /public). Place shopie.otf in /public or /public/fonts/. -->
-    <link
-      rel="preload"
-      href="%PUBLIC_URL%/shopie.otf"
-      as="font"
-      type="font/otf"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/Shopie.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/Trivia-grotesk.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <!-- Preconnect to external domains for faster resource loading -->
+    <link rel="preconnect" href="https://manslater.onrender.com" />
+    <link rel="dns-prefetch" href="https://manslater.onrender.com" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.

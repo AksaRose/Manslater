@@ -4,6 +4,11 @@ import "./Convo.css";
 
 export default function Convo() {
   useEffect(() => {
+    // Preload html2canvas in the background for faster share functionality
+    import("html2canvas").catch(() => {
+      // Silently fail if it can't load
+    });
+
     // remove transition class if it was left on the body
     if (
       document &&

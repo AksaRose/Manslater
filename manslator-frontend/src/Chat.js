@@ -1,8 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import html2canvas from "html2canvas";
 import "./Convo.css";
 import ShareButton from "./ShareButton";
 import "./ShareButton.css";
+
+// Lazy load html2canvas - it's a heavy library, only load when needed
+let html2canvas = null;
+const loadHtml2Canvas = async () => {
+  if (!html2canvas) {
+    const module = await import("html2canvas");
+    html2canvas = module.default;
+  }
+  return html2canvas;
+};
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -190,7 +199,9 @@ const Chat = () => {
         ? Math.min(1.6, dpr * 1.2)
         : Math.min(2, dpr * 1.5);
 
-      const conversationCanvas = await html2canvas(captureTarget, {
+      // Lazy load html2canvas only when needed (saves ~200KB on initial load)
+      const html2canvasLib = await loadHtml2Canvas();
+      const conversationCanvas = await html2canvasLib(captureTarget, {
         backgroundColor: null,
         scale: canvasScale,
       });
